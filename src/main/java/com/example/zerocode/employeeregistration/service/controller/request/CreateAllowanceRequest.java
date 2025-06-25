@@ -1,14 +1,26 @@
 package com.example.zerocode.employeeregistration.service.controller.request;
 
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
 public class CreateAllowanceRequest {
-    private Long id;
-    private String allowanceType;
-    private Double allowanceFee;
-    private String allowanceDate;
+
+  @NotBlank
+  @Size(max = 255)
+  private String allowanceType;
+
+  @NotNull
+  @Digits(fraction = 2, integer = 8)
+  private BigDecimal allowanceFee;
+
+  @NotNull
+  private String allowanceDate;
 
 }
