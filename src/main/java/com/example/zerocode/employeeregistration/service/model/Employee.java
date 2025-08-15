@@ -48,8 +48,8 @@ public class Employee {
     @OneToMany(mappedBy = "employee")
     private List<Leave> leaves;
 
-    @OneToMany(mappedBy = "employee")
-    private List<Bonus> bonuses;
+//    @OneToMany(mappedBy = "employee")
+//    private List<Bonus> bonuses;
 
     @OneToOne(mappedBy = "employee")
     private Salary salary;
