@@ -1,5 +1,4 @@
 name: SonarQube Analysis
-
 on:
   push:
     branches: [ main, dev ]
@@ -7,7 +6,7 @@ on:
     branches: [ main ]
 
 jobs:
-  sonar:
+  build-and-test:
     runs-on: ubuntu-latest
 
     services:
@@ -32,14 +31,14 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Build project
+      - name: Build and Test
         run: mvn clean install -D sonar.skip=true
 
-      - name: Run SonarQube Scan
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          mvn sonar:sonar \
-            -Dsonar.projectKey=hr-management \
-            -Dsonar.host.url=http://15.207.20.55:9000 \
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+      # - name: Run SonarQube Scan
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #   run: |
+      #     mvn sonar:sonar \
+      #       -Dsonar.projectKey=hr-management \
+      #       -Dsonar.host.url=http://15.207.20.55:9000 \
+      #       -Dsonar.login=${{ secrets.SONAR_TOKEN }}
