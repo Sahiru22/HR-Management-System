@@ -33,7 +33,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build project
-        run: mvn clean verify -DskipTests
+        run: mvn clean install -D sonar.skip=true
 
       - name: Run SonarQube Scan
         env:
