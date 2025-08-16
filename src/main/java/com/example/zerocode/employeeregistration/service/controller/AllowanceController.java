@@ -34,6 +34,13 @@ public class AllowanceController {
     return allowanceService.getAllowance(employeeId);
   }
 
+  @GetMapping(value = "/employees/{employee-id}/allowances/{allowance-id}", headers = "version=v1")
+  public List<AllowanceResponse> getById(@PathVariable("employee-id") Long employeeId,
+      @PathVariable("allowance-id") Long allowanceId)
+      throws EmployeeNotFoundException, AllowanceNotFoundException {
+    return allowanceService.getAllowanceById(employeeId, allowanceId);
+  }
+
   @PutMapping(value = "/employees/{employee-id}/allowances/{allowance-id}", headers = "version=v1")
   public CreateAllowanceResponse update(@RequestBody CreateAllowanceRequest request,
       @PathVariable("employee-id") Long employeeId,

@@ -14,6 +14,9 @@ public interface AllowanceService {
 
   List<AllowanceResponse> getAllowance(Long employeeId) throws EmployeeNotFoundException;
 
+  List<AllowanceResponse> getAllowanceById(Long employeeId, Long allowanceId)
+      throws EmployeeNotFoundException, AllowanceNotFoundException;
+
   CreateAllowanceResponse updateAllowance(CreateAllowanceRequest request, Long employeeId,
       Long allowanceId) throws EmployeeNotFoundException, AllowanceNotFoundException;
 
