@@ -6,6 +6,7 @@ import com.example.zerocode.employeeregistration.service.controller.response.Cre
 import com.example.zerocode.employeeregistration.service.exception.AllowanceNotFoundException;
 import com.example.zerocode.employeeregistration.service.exception.EmployeeNotFoundException;
 import com.example.zerocode.employeeregistration.service.service.AllowanceService;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,7 +24,7 @@ public class AllowanceController {
   private final AllowanceService allowanceService;
 
   @PostMapping(value = "/employees/{employee-id}/allowances", headers = "version=v1")
-  public CreateAllowanceResponse add(@RequestBody CreateAllowanceRequest request,
+  public CreateAllowanceResponse add(@Valid @RequestBody CreateAllowanceRequest request,
       @PathVariable("employee-id") Long employeeId) throws EmployeeNotFoundException {
     return allowanceService.addAllowance(request, employeeId);
   }
@@ -42,7 +43,7 @@ public class AllowanceController {
   }
 
   @PutMapping(value = "/employees/{employee-id}/allowances/{allowance-id}", headers = "version=v1")
-  public CreateAllowanceResponse update(@RequestBody CreateAllowanceRequest request,
+  public CreateAllowanceResponse update(@Valid @RequestBody CreateAllowanceRequest request,
       @PathVariable("employee-id") Long employeeId,
       @PathVariable("allowance-id") Long allowanceId)
       throws EmployeeNotFoundException, AllowanceNotFoundException {
