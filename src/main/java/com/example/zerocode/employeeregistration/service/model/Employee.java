@@ -1,16 +1,22 @@
 package com.example.zerocode.employeeregistration.service.model;
 
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.Data;
 
@@ -23,17 +29,44 @@ public class Employee {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(name = "Employee_name")
-  private String name;
-  private Integer age;
-  private String address;
-  private String gender;
-  private String email;
-  private String bloodGroup;
-  private String maritalStatus;
-  private String dateOfBirth;
+  @NotBlank
+  @Size(max = 60)
+  private String firstName;
 
-  @ManyToOne
+  @NotBlank
+  @Size(max = 60)
+  private String lastName;
+
+  @NotNull
+  private Integer age;
+
+  @NotBlank
+  @Size(max = 255)
+  private String address;
+
+  @NotNull
+  private Gender gender;
+
+  @NotBlank
+  @Email
+  @Size(max = 60)
+  private String email;
+
+  private String bloodGroup;
+
+  @NotNull
+  private MaritalStatus maritalStatus;
+
+  @NotNull
+  private LocalDate birthDate;
+
+  @NotBlank
+  @Digits(integer = 10, fraction = 0)
+  private String phoneNumber;
+
+  @NotNull
+  @ManyToOne(optional = false)
+  @JoinColumn(name = "department_id")
   private Department department;
 
   @OneToMany(mappedBy = "employee")
