@@ -60,7 +60,7 @@ public class SalaryServiceImpl implements SalaryService {
                     .basicSalary(salary.getBasicSalary())
                     .salarySchedule(salary.getSalarySchedule())
                     .salaryDate(salary.getSalaryDate())
-                    .employeeName(salary.getEmployee().getName())
+                    .employeeName(salary.getEmployee().getFirstName() + " " + salary.getEmployee().getLastName())
                     .build();
     }
 
@@ -76,7 +76,7 @@ public class SalaryServiceImpl implements SalaryService {
                         .basicSalary(salary.getBasicSalary())
                         .salarySchedule(salary.getSalarySchedule())
                         .salaryDate(salary.getSalaryDate())
-                        .employeeName(salary.getEmployee().getName())
+                        .employeeName(salary.getEmployee().getFirstName() + " " + salary.getEmployee().getLastName())
                         .build())
                 .toList();
     }
