@@ -24,5 +24,4 @@ public class CreateAllowanceRequest {
 
   @NotNull
   private String allowanceDate;
-
 }
