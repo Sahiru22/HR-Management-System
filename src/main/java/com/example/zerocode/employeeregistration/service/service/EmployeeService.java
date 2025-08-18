@@ -5,20 +5,21 @@ import com.example.zerocode.employeeregistration.service.controller.response.Cre
 import com.example.zerocode.employeeregistration.service.controller.response.EmployeeResponse;
 import com.example.zerocode.employeeregistration.service.exception.DepartmentNotFoundException;
 import com.example.zerocode.employeeregistration.service.exception.EmployeeNotFoundException;
-
 import java.util.List;
 
 public interface EmployeeService {
 
-    CreateEmployeeResponse add(CreateEmployeeRequest request, Long departmentId) throws DepartmentNotFoundException;
+  CreateEmployeeResponse add(CreateEmployeeRequest request) throws DepartmentNotFoundException;
 
-    List<EmployeeResponse> getAll();
+  List<EmployeeResponse> getAll();
 
-    EmployeeResponse getById(Long employeeId) throws EmployeeNotFoundException;
+  EmployeeResponse getById(Long employeeId) throws EmployeeNotFoundException;
 
-    CreateEmployeeResponse deleteById(Long employeeId) throws EmployeeNotFoundException;
+  CreateEmployeeResponse deleteById(Long employeeId) throws EmployeeNotFoundException;
 
-    CreateEmployeeResponse updateById(Long employeeId, CreateEmployeeRequest request) throws EmployeeNotFoundException;
+  CreateEmployeeResponse updateById(Long employeeId, CreateEmployeeRequest request)
+      throws EmployeeNotFoundException, DepartmentNotFoundException;
 
-    List<EmployeeResponse> getAllEmployeeByDepartmentId(Long departmentId) throws DepartmentNotFoundException;
+  List<EmployeeResponse> getAllEmployeeByDepartmentId(Long departmentId)
+      throws DepartmentNotFoundException;
 }

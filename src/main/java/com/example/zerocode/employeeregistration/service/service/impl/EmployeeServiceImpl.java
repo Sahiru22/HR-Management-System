@@ -10,153 +10,160 @@ import com.example.zerocode.employeeregistration.service.model.Employee;
 import com.example.zerocode.employeeregistration.service.repository.DepartmentRepository;
 import com.example.zerocode.employeeregistration.service.repository.EmployeeRepository;
 import com.example.zerocode.employeeregistration.service.service.EmployeeService;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class EmployeeServiceImpl implements EmployeeService {
 
-    private final EmployeeRepository employeeRepository;
-    private final DepartmentRepository departmentRepository;
+  private final EmployeeRepository employeeRepository;
+  private final DepartmentRepository departmentRepository;
+  private final ModelMapper modelMapper;
 
-    @Override
-    public CreateEmployeeResponse add(CreateEmployeeRequest request, Long departmentId) throws DepartmentNotFoundException {
+  @Override
+  public CreateEmployeeResponse add(CreateEmployeeRequest request)
+      throws DepartmentNotFoundException {
 
-        Department department = departmentRepository.findById(departmentId)
-                .orElseThrow(() -> new DepartmentNotFoundException("Not found department with id: " + departmentId));
-
-        Employee employee = new Employee();
-
-        employee.setId(request.getId());
-        employee.setName(request.getName());
-        employee.setAge(request.getAge());
-        employee.setAddress(request.getAddress());
-        employee.setGender(request.getGender());
-        employee.setEmail(request.getEmail());
-        employee.setBloodGroup(request.getBloodGroup());
-        employee.setMaritalStatus(request.getMaritalStatus());
-        employee.setDateOfBirth(request.getDateOfBirth());
-
-        employee.setDepartment(department);
-
-        employeeRepository.save(employee);
-
-        CreateEmployeeResponse response = new CreateEmployeeResponse();
-        response.setId(employee.getId());
-
-        System.out.println("employee added successfully. employee id: " + employee.getId());
-
-        return response;
-
+    var employee = new Employee();
+    modelMapper.map(request, employee);
+    if (request.getDepartmentId() != null) {
+      Long departmentId = request.getDepartmentId();
+      Department department = departmentRepository.findById(departmentId)
+          .orElseThrow(() -> new DepartmentNotFoundException(
+              "Department not found with id: " + departmentId));
+      employee.setDepartment(department);
     }
+    employeeRepository.save(employee);
 
-    @Override
-    public List<EmployeeResponse> getAll() {
-        System.out.println("Getting all employees");
+    CreateEmployeeResponse response = new CreateEmployeeResponse();
+    response.setId(employee.getId());
 
-        List<Employee> employees = employeeRepository.findAll();
+    log.info("employee added successfully. employee id:{}", employee.getId());
 
-        return employees.stream()
-                .map(employee -> EmployeeResponse.builder()
-                        .id(employee.getId())
-                        .name(employee.getName())
-                        .age(employee.getAge())
-                        .address(employee.getAddress())
-                        .gender(employee.getGender())
-                        .email(employee.getEmail())
-                        .bloodGroup(employee.getBloodGroup())
-                        .maritalStatus(employee.getMaritalStatus())
-                        .dateOfBirth(employee.getDateOfBirth())
-                        .build())
-                .toList();
+    return response;
+
+  }
+
+  @Override
+  public List<EmployeeResponse> getAll() {
+    log.info("Getting all employees");
+
+    List<Employee> employees = employeeRepository.findAll();
+
+    return employees.stream()
+        .map(employee -> EmployeeResponse.builder()
+            .id(employee.getId())
+            .firstName(employee.getFirstName())
+            .lastName(employee.getLastName())
+            .age(employee.getAge())
+            .address(employee.getAddress())
+            .gender(employee.getGender())
+            .email(employee.getEmail())
+            .bloodGroup(employee.getBloodGroup())
+            .maritalStatus(employee.getMaritalStatus())
+            .phoneNumber(employee.getPhoneNumber())
+            .birthDate(employee.getBirthDate())
+            .build())
+        .toList();
+  }
+
+  @Override
+  public EmployeeResponse getById(Long employeeId) throws EmployeeNotFoundException {
+    log.info("Get employee details by id : {}", employeeId);
+
+    var employee = employeeRepository.findById(employeeId)
+        .orElseThrow(
+            () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
+
+    return EmployeeResponse.builder()
+        .id(employee.getId())
+        .firstName(employee.getFirstName())
+        .lastName(employee.getLastName())
+        .age(employee.getAge())
+        .address(employee.getAddress())
+        .gender(employee.getGender())
+        .email(employee.getEmail())
+        .bloodGroup(employee.getBloodGroup())
+        .maritalStatus(employee.getMaritalStatus())
+        .phoneNumber(employee.getPhoneNumber())
+        .birthDate(employee.getBirthDate())
+        .build();
+  }
+
+  @Override
+  public CreateEmployeeResponse deleteById(Long employeeId) throws EmployeeNotFoundException {
+    log.info("employee delete by id : {}", employeeId);
+
+    var employee = employeeRepository.findById(employeeId)
+        .orElseThrow(
+            () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
+
+    employeeRepository.deleteById(employee.getId());
+
+    CreateEmployeeResponse response = new CreateEmployeeResponse();
+    response.setId(employee.getId());
+
+    return response;
+  }
+
+  @Override
+  public CreateEmployeeResponse updateById(Long employeeId, CreateEmployeeRequest request)
+      throws EmployeeNotFoundException, DepartmentNotFoundException {
+    log.info("employee update by id : {}", employeeId);
+
+    var employee = employeeRepository.findById(employeeId)
+        .orElseThrow(
+            () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
+
+    modelMapper.map(request, employee);
+    if (request.getDepartmentId() != null) {
+      Long departmentId = request.getDepartmentId();
+      Department department = departmentRepository.findById(departmentId)
+          .orElseThrow(() -> new DepartmentNotFoundException(
+              "Department not found with id: " + departmentId));
+      employee.setDepartment(department);
     }
+    employeeRepository.save(employee);
 
-    @Override
-    public EmployeeResponse getById(Long employeeId) throws EmployeeNotFoundException {
-        System.out.println("Get employee details by id : " + employeeId);
+    CreateEmployeeResponse response = new CreateEmployeeResponse();
+    response.setId(employee.getId());
 
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
+    return response;
 
-        return EmployeeResponse.builder()
-                .id(employee.getId())
-                .name(employee.getName())
-                .age(employee.getAge())
-                .address(employee.getAddress())
-                .gender(employee.getGender())
-                .email(employee.getEmail())
-                .bloodGroup(employee.getBloodGroup())
-                .maritalStatus(employee.getMaritalStatus())
-                .dateOfBirth(employee.getDateOfBirth())
-                .build();
-    }
+  }
 
-    @Override
-    public CreateEmployeeResponse deleteById(Long employeeId) throws EmployeeNotFoundException {
-        System.out.println("employee delete by id: " + employeeId);
+  @Override
+  public List<EmployeeResponse> getAllEmployeeByDepartmentId(Long departmentId)
+      throws DepartmentNotFoundException {
+    log.info("Getting all employees with department id: {}", departmentId);
 
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
+    Department department = departmentRepository.findById(departmentId)
+        .orElseThrow(
+            () -> new DepartmentNotFoundException("Not found department with id: " + departmentId));
 
-        employeeRepository.deleteById(employee.getId());
+    List<Employee> employees = employeeRepository.findByDepartment(department);
 
-        CreateEmployeeResponse response = new CreateEmployeeResponse();
-        response.setId(employee.getId());
-
-        return response;
-    }
-
-    @Override
-    public CreateEmployeeResponse updateById(Long employeeId, CreateEmployeeRequest request) throws EmployeeNotFoundException {
-        System.out.println("update by id : " + employeeId);
-
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
-
-        employee.setName(request.getName());
-        employee.setAge(request.getAge());
-        employee.setAddress(request.getAddress());
-        employee.setGender(request.getGender());
-        employee.setEmail(request.getEmail());
-        employee.setBloodGroup(request.getBloodGroup());
-        employee.setMaritalStatus(request.getMaritalStatus());
-        employee.setDateOfBirth(request.getDateOfBirth());
-
-        employeeRepository.save(employee);
-
-        CreateEmployeeResponse response = new CreateEmployeeResponse();
-        response.setId(employee.getId());
-
-        return response;
-
-    }
-
-    @Override
-    public List<EmployeeResponse> getAllEmployeeByDepartmentId(Long departmentId) throws DepartmentNotFoundException{
-        System.out.println("Getting all employees with department id: " + departmentId);
-
-        Department department = departmentRepository.findById(departmentId)
-                .orElseThrow(() -> new DepartmentNotFoundException("Not found department with id: " + departmentId));
-
-        List<Employee> employees = employeeRepository.findByDepartment(department);
-
-        return employees.stream()
-                .map(employee -> EmployeeResponse.builder()
-                        .id(employee.getId())
-                        .name(employee.getName())
-                        .age(employee.getAge())
-                        .address(employee.getAddress())
-                        .gender(employee.getGender())
-                        .email(employee.getEmail())
-                        .bloodGroup(employee.getBloodGroup())
-                        .maritalStatus(employee.getMaritalStatus())
-                        .dateOfBirth(employee.getDateOfBirth())
-                        .build())
-                .toList();
-    }
+    return employees.stream()
+        .map(employee -> EmployeeResponse.builder()
+            .id(employee.getId())
+            .firstName(employee.getFirstName())
+            .lastName(employee.getLastName())
+            .age(employee.getAge())
+            .address(employee.getAddress())
+            .gender(employee.getGender())
+            .email(employee.getEmail())
+            .bloodGroup(employee.getBloodGroup())
+            .maritalStatus(employee.getMaritalStatus())
+            .phoneNumber(employee.getPhoneNumber())
+            .birthDate(employee.getBirthDate())
+            .build())
+        .toList();
+  }
 }
 
 
