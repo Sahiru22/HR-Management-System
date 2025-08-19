@@ -1,8 +1,8 @@
 package com.example.zerocode.employeeregistration.service.exception;
 
-public class BonusNotFoundException extends Exception{
+public class BonusNotFoundException extends Exception {
 
-    public BonusNotFoundException(String message) {
-        super(message);
-    }
+  public BonusNotFoundException(String message) {
+    super(message);
+  }
 }

@@ -88,14 +88,8 @@ public class Employee {
   @OneToMany(mappedBy = "employee")
   private List<Leave> leaves;
 
-//    @OneToMany(mappedBy = "employee")
-//    private List<Bonus> bonuses;
-
   @OneToOne(mappedBy = "employee")
   private Salary salary;
-
-//  @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-//  private List<Allowance> allowances;
 
   @OneToMany(mappedBy = "employee")
   private List<Insurance> insurances;
