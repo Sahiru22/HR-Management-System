@@ -1,8 +1,6 @@
 package com.example.zerocode.employeeregistration.service.model;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -96,8 +94,8 @@ public class Employee {
   @OneToOne(mappedBy = "employee")
   private Salary salary;
 
-  @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-  private List<Allowance> allowances;
+//  @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+//  private List<Allowance> allowances;
 
   @OneToMany(mappedBy = "employee")
   private List<Insurance> insurances;

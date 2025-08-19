@@ -29,15 +29,14 @@ public class EmployeeServiceImpl implements EmployeeService {
   public CreateEmployeeResponse add(CreateEmployeeRequest request)
       throws DepartmentNotFoundException {
 
+    Long departmentId = request.getDepartmentId();
+    Department department = departmentRepository.findById(departmentId)
+        .orElseThrow(() -> new DepartmentNotFoundException(
+            "Department not found with id: " + departmentId));
+
     var employee = new Employee();
     modelMapper.map(request, employee);
-    if (request.getDepartmentId() != null) {
-      Long departmentId = request.getDepartmentId();
-      Department department = departmentRepository.findById(departmentId)
-          .orElseThrow(() -> new DepartmentNotFoundException(
-              "Department not found with id: " + departmentId));
-      employee.setDepartment(department);
-    }
+    employee.setDepartment(department);
     employeeRepository.save(employee);
 
     CreateEmployeeResponse response = new CreateEmployeeResponse();
@@ -46,7 +45,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     log.info("employee added successfully. employee id:{}", employee.getId());
 
     return response;
-
   }
 
   @Override
