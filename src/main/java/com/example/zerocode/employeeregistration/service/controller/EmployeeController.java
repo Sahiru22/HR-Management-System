@@ -6,6 +6,7 @@ import com.example.zerocode.employeeregistration.service.controller.response.Emp
 import com.example.zerocode.employeeregistration.service.exception.DepartmentNotFoundException;
 import com.example.zerocode.employeeregistration.service.exception.EmployeeNotFoundException;
 import com.example.zerocode.employeeregistration.service.service.EmployeeService;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,7 +24,7 @@ public class EmployeeController {
   private final EmployeeService employeeService;
 
   @PostMapping(value = "/employees", headers = "version=v1")
-  public CreateEmployeeResponse addNewEmployee(@RequestBody CreateEmployeeRequest request)
+  public CreateEmployeeResponse addNewEmployee(@Valid @RequestBody CreateEmployeeRequest request)
       throws DepartmentNotFoundException {
     return employeeService.add(request);
   }
@@ -47,7 +48,7 @@ public class EmployeeController {
 
   @PutMapping(value = "/employees/{employee-id}", headers = "version=v1")
   public CreateEmployeeResponse updateById(@PathVariable("employee-id") Long employeeId,
-      @RequestBody CreateEmployeeRequest request)
+      @Valid @RequestBody CreateEmployeeRequest request)
       throws EmployeeNotFoundException, DepartmentNotFoundException {
     return employeeService.updateById(employeeId, request);
   }

@@ -38,7 +38,7 @@ public class BonusServiceImpl implements BonusService {
     bonus.setEmployee(employee);
     bonusRepository.save(bonus);
 
-    CreateBonusResponse response = new CreateBonusResponse();
+    var response = new CreateBonusResponse();
     response.setId(bonus.getId());
 
     return response;
@@ -79,7 +79,7 @@ public class BonusServiceImpl implements BonusService {
     modelMapper.map(request, bonus);
     bonusRepository.save(bonus);
 
-    CreateBonusResponse response = new CreateBonusResponse();
+    var response = new CreateBonusResponse();
     response.setId(bonus.getId());
 
     return response;
@@ -99,7 +99,7 @@ public class BonusServiceImpl implements BonusService {
 
     bonusRepository.delete(bonus);
 
-    CreateBonusResponse response = new CreateBonusResponse();
+    var response = new CreateBonusResponse();
     response.setId(bonus.getId());
 
     return response;

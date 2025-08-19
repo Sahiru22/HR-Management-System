@@ -5,15 +5,22 @@ import com.example.zerocode.employeeregistration.service.controller.response.Cre
 import com.example.zerocode.employeeregistration.service.controller.response.EducationalQualificationResponse;
 import com.example.zerocode.employeeregistration.service.exception.EducationQualificationNotFoundException;
 import com.example.zerocode.employeeregistration.service.exception.EmployeeNotFoundException;
-
 import java.util.List;
 
-public interface EducationalQualificationService{
-    CreateEducationalQualificationResponse addQualifications(CreateEducationalQualificationRequest request, Long employeeId) throws EmployeeNotFoundException;
+public interface EducationalQualificationService {
 
-    List<EducationalQualificationResponse> getQualificationByEmployeeId(Long employeeId) throws EmployeeNotFoundException;
+  CreateEducationalQualificationResponse addQualifications(
+      CreateEducationalQualificationRequest request, Long employeeId)
+      throws EmployeeNotFoundException;
 
-    CreateEducationalQualificationResponse updateQualificationById(CreateEducationalQualificationRequest request, Long employeeId, Long educationalQualificationId) throws EmployeeNotFoundException, EducationQualificationNotFoundException;
+  List<EducationalQualificationResponse> getQualificationByEmployeeId(Long employeeId)
+      throws EmployeeNotFoundException;
 
-    CreateEducationalQualificationResponse deleteQualifications(Long educationalQualificationId, Long employeeId) throws EmployeeNotFoundException, EducationQualificationNotFoundException;
+  CreateEducationalQualificationResponse updateQualificationById(
+      CreateEducationalQualificationRequest request, Long employeeId,
+      Long educationalQualificationId)
+      throws EmployeeNotFoundException, EducationQualificationNotFoundException;
+
+  CreateEducationalQualificationResponse deleteQualifications(Long educationalQualificationId,
+      Long employeeId) throws EmployeeNotFoundException, EducationQualificationNotFoundException;
 }

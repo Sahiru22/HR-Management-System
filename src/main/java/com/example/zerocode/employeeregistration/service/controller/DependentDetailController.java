@@ -6,6 +6,7 @@ import com.example.zerocode.employeeregistration.service.controller.response.Dep
 import com.example.zerocode.employeeregistration.service.exception.DependentDetailsNotFoundException;
 import com.example.zerocode.employeeregistration.service.exception.EmployeeNotFoundException;
 import com.example.zerocode.employeeregistration.service.service.DependentDetailService;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,7 +25,7 @@ public class DependentDetailController {
 
   @PostMapping(value = "/employees/{employee-id}/dependent-details", headers = "version=v1")
   public CreateDependentDetailResponse addDependentDetail(
-      @RequestBody CreateDependentDetailRequest request,
+      @Valid @RequestBody CreateDependentDetailRequest request,
       @PathVariable("employee-id") Long employeeId) throws EmployeeNotFoundException {
     return dependentDetailService.addDependentDetails(request, employeeId);
   }
@@ -37,7 +38,7 @@ public class DependentDetailController {
 
   @PutMapping(value = "/employees/{employee-id}/dependent-details/{dependent-details-id}", headers = "version=v1")
   public CreateDependentDetailResponse updateDependent(
-      @RequestBody CreateDependentDetailRequest request,
+      @Valid @RequestBody CreateDependentDetailRequest request,
       @PathVariable("employee-id") Long employeeId,
       @PathVariable("dependent-details-id") Long dependentDetailsId)
       throws EmployeeNotFoundException, DependentDetailsNotFoundException {
