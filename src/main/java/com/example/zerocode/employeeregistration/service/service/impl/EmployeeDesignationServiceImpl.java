@@ -44,7 +44,6 @@ public class EmployeeDesignationServiceImpl implements EmployeeDesignationServic
                 employeeDesignation.setEndDate(request.getEndDate());
 
                 employeeDesignation.setEmployee(employee);
-                employeeDesignation.setDepartment(department);
 
                 employeeDesignationRepository.save(employeeDesignation);
 
@@ -66,7 +65,6 @@ public class EmployeeDesignationServiceImpl implements EmployeeDesignationServic
         return employeeDesignations.stream()
                 .map(employeeDesignation -> EmployeeDesignationResponse .builder()
                         .id(employeeDesignation.getId())
-                        .DepartmentName(employeeDesignation.getDepartment().getName())
                         .jobPosition(employeeDesignation.getJobPosition())
                         .startDate(employeeDesignation.getStartDate())
                         .endDate(employeeDesignation.getEndDate())

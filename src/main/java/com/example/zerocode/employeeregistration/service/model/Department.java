@@ -1,26 +1,24 @@
 package com.example.zerocode.employeeregistration.service.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
-
-import java.util.List;
 
 @Data
 @Entity
 @Table(name = "departments")
 public class Department {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(name = "department_name")
-    private String name;
-
-    @OneToMany(mappedBy = "department")
-    private List<Employee>employees;
-
-    @OneToMany(mappedBy = "department")
-    private List<EmployeeDesignation> employeeDesignations;
-
+  @NotBlank
+  @Size(max = 60)
+  private String name;
 }

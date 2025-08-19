@@ -4,17 +4,18 @@ import com.example.zerocode.employeeregistration.service.controller.request.Crea
 import com.example.zerocode.employeeregistration.service.controller.response.CreateDepartmentResponse;
 import com.example.zerocode.employeeregistration.service.controller.response.DepartmentResponse;
 import com.example.zerocode.employeeregistration.service.exception.DepartmentNotFoundException;
-
 import java.util.List;
 
 public interface DepartmentService {
-    CreateDepartmentResponse add(CreateDepartmentRequest request);
 
-    List<DepartmentResponse> getAll();
+  CreateDepartmentResponse add(CreateDepartmentRequest request);
 
-    DepartmentResponse getById(Long departmentId) throws DepartmentNotFoundException;
+  List<DepartmentResponse> getAll();
 
-    CreateDepartmentResponse deleteById(Long departmentId) throws DepartmentNotFoundException;
+  DepartmentResponse getById(Long departmentId) throws DepartmentNotFoundException;
 
-    CreateDepartmentResponse updateById(Long departmentId, CreateDepartmentRequest request) throws DepartmentNotFoundException;
+  CreateDepartmentResponse deleteById(Long departmentId) throws DepartmentNotFoundException;
+
+  CreateDepartmentResponse updateById(Long departmentId, CreateDepartmentRequest request)
+      throws DepartmentNotFoundException;
 }

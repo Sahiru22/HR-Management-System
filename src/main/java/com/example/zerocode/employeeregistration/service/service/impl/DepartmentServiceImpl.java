@@ -7,92 +7,97 @@ import com.example.zerocode.employeeregistration.service.exception.DepartmentNot
 import com.example.zerocode.employeeregistration.service.model.Department;
 import com.example.zerocode.employeeregistration.service.repository.DepartmentRepository;
 import com.example.zerocode.employeeregistration.service.service.DepartmentService;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class DepartmentServiceImpl implements DepartmentService {
 
-    private final DepartmentRepository departmentRepository;
+  private final DepartmentRepository departmentRepository;
+  private final ModelMapper modelMapper;
 
-    @Override
-    public CreateDepartmentResponse add(CreateDepartmentRequest request) {
+  @Override
+  public CreateDepartmentResponse add(CreateDepartmentRequest request) {
 
-        Department department = new Department();
-        department.setId(request.getId());
-        department.setName(request.getName());
+    var department = new Department();
+    modelMapper.map(request, department);
+    departmentRepository.save(department);
 
-        departmentRepository.save(department);
+    CreateDepartmentResponse response = new CreateDepartmentResponse();
+    response.setId(department.getId());
 
-        CreateDepartmentResponse response = new CreateDepartmentResponse();
-        response.setId(department.getId());
+    log.info("department added successfully: {}", department.getId());
 
-        System.out.println("department added successfully :" + department.getId());
+    return response;
+  }
 
-        return response;
-    }
+  @Override
+  public List<DepartmentResponse> getAll() {
+    System.out.println("Getting all department");
+    log.info("Getting all department");
 
-    @Override
-    public List<DepartmentResponse> getAll() {
-        System.out.println("Getting all department");
+    List<Department> departments = departmentRepository.findAll();
 
-        List<Department> departments =departmentRepository.findAll();
+    return departments.stream()
+        .map(department -> DepartmentResponse.builder()
+            .id(department.getId())
+            .name(department.getName())
+            .build())
+        .toList();
+  }
 
-        return departments.stream()
-                .map(department -> DepartmentResponse.builder()
-                        .id(department.getId())
-                        .name(department.getName())
-                        .build())
-                .toList();
-    }
+  @Override
+  public DepartmentResponse getById(Long departmentId) throws DepartmentNotFoundException {
+    log.info("getting departments by id: {}", departmentId);
 
-    @Override
-    public DepartmentResponse getById(Long departmentId) throws DepartmentNotFoundException{
-        System.out.println("getting departments by id: " + departmentId);
+    var department = departmentRepository.findById(departmentId)
+        .orElseThrow(
+            () -> new DepartmentNotFoundException("Not found department with id:" + departmentId));
 
-        Department department = departmentRepository.findById(departmentId)
-                .orElseThrow(() -> new DepartmentNotFoundException("Not found department with id:" + departmentId));
+    return DepartmentResponse.builder()
+        .id(department.getId())
+        .name(department.getName())
+        .build();
+  }
 
-        return DepartmentResponse.builder()
-                .id(department.getId())
-                .name(department.getName())
-                .build();
-        }
-        
 
-    @Override
-    public CreateDepartmentResponse deleteById(Long departmentId) throws DepartmentNotFoundException {
-        System.out.println("department delete by id : " + departmentId);
+  @Override
+  public CreateDepartmentResponse deleteById(Long departmentId) throws DepartmentNotFoundException {
+    log.info("department delete by id : {}", departmentId);
 
-        Department department = departmentRepository.findById(departmentId)
-                        .orElseThrow(() -> new DepartmentNotFoundException("Not found department with id:" + departmentId));
+    var department = departmentRepository.findById(departmentId)
+        .orElseThrow(
+            () -> new DepartmentNotFoundException("Not found department with id:" + departmentId));
 
-        departmentRepository.delete(department);
+    departmentRepository.delete(department);
 
-        CreateDepartmentResponse response = new CreateDepartmentResponse();
-        response.setId(department.getId());
+    CreateDepartmentResponse response = new CreateDepartmentResponse();
+    response.setId(department.getId());
 
-        return response;
-    }
+    return response;
+  }
 
-    @Override
-    public CreateDepartmentResponse updateById(Long departmentId, CreateDepartmentRequest request) throws DepartmentNotFoundException {
-        System.out.println("update by id : " + departmentId);
+  @Override
+  public CreateDepartmentResponse updateById(Long departmentId, CreateDepartmentRequest request)
+      throws DepartmentNotFoundException {
+    log.info("update by id: {}", departmentId);
 
-        Department department = departmentRepository.findById(departmentId)
-                        .orElseThrow(() -> new DepartmentNotFoundException("Not found department with id:" + departmentId));
+    var department = departmentRepository.findById(departmentId)
+        .orElseThrow(
+            () -> new DepartmentNotFoundException("Not found department with id:" + departmentId));
 
-            department.setName(request.getName());
+    modelMapper.map(request, department);
+    departmentRepository.save(department);
 
-            departmentRepository.save(department);
+    CreateDepartmentResponse response = new CreateDepartmentResponse();
+    response.setId(department.getId());
 
-            CreateDepartmentResponse response = new CreateDepartmentResponse();
-            response.setId(department.getId());
+    return response;
 
-            return response;
-
-    }
+  }
 }

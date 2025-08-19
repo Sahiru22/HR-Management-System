@@ -48,8 +48,6 @@ public class DepartmentController {
       @RequestBody CreateDepartmentRequest request) throws DepartmentNotFoundException {
     return departmentService.updateById(departmentId, request);
   }
-
-
 }
 
 
