@@ -58,6 +58,7 @@ public class AllowanceServiceImpl implements AllowanceService {
 
     return allowances.stream()
         .map(allowance -> AllowanceResponse.builder()
+            .id(allowance.getId())
             .allowanceType(allowance.getAllowanceType())
             .allowanceFee(allowance.getAllowanceFee())
             .allowanceDate(allowance.getAllowanceDate())
@@ -80,6 +81,7 @@ public class AllowanceServiceImpl implements AllowanceService {
             () -> new AllowanceNotFoundException("Not found allowance with id:" + allowanceId));
 
     return List.of(AllowanceResponse.builder()
+        .id(allowance.getId())
         .allowanceType(allowance.getAllowanceType())
         .allowanceFee(allowance.getAllowanceFee())
         .allowanceDate(allowance.getAllowanceDate())

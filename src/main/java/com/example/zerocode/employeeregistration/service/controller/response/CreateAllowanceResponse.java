@@ -4,5 +4,6 @@ import lombok.Data;
 
 @Data
 public class CreateAllowanceResponse {
-    private Long id;
+
+  private Long id;
 }
