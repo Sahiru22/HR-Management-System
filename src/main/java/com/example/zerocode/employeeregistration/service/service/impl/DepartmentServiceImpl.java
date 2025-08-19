@@ -28,7 +28,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     modelMapper.map(request, department);
     departmentRepository.save(department);
 
-    CreateDepartmentResponse response = new CreateDepartmentResponse();
+    var response = new CreateDepartmentResponse();
     response.setId(department.getId());
 
     log.info("department added successfully: {}", department.getId());
@@ -76,7 +76,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     departmentRepository.delete(department);
 
-    CreateDepartmentResponse response = new CreateDepartmentResponse();
+    var response = new CreateDepartmentResponse();
     response.setId(department.getId());
 
     return response;
@@ -94,7 +94,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     modelMapper.map(request, department);
     departmentRepository.save(department);
 
-    CreateDepartmentResponse response = new CreateDepartmentResponse();
+    var response = new CreateDepartmentResponse();
     response.setId(department.getId());
 
     return response;

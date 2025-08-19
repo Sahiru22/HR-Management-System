@@ -39,7 +39,7 @@ public class AllowanceServiceImpl implements AllowanceService {
 
     allowanceRepository.save(allowance);
 
-    CreateAllowanceResponse response = new CreateAllowanceResponse();
+    var response = new CreateAllowanceResponse();
     response.setId(allowance.getId());
 
     return response;
@@ -106,7 +106,7 @@ public class AllowanceServiceImpl implements AllowanceService {
 
     allowanceRepository.save(allowance);
 
-    CreateAllowanceResponse response = new CreateAllowanceResponse();
+    var response = new CreateAllowanceResponse();
     response.setId(allowance.getId());
 
     return response;
@@ -127,7 +127,7 @@ public class AllowanceServiceImpl implements AllowanceService {
 
     allowanceRepository.delete(allowance);
 
-    CreateAllowanceResponse response = new CreateAllowanceResponse();
+    var response = new CreateAllowanceResponse();
     response.setId(allowance.getId());
 
     return response;

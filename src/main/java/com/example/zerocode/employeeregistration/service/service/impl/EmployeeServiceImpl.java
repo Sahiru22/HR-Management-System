@@ -39,7 +39,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     employee.setDepartment(department);
     employeeRepository.save(employee);
 
-    CreateEmployeeResponse response = new CreateEmployeeResponse();
+    var response = new CreateEmployeeResponse();
     response.setId(employee.getId());
 
     log.info("employee added successfully. employee id:{}", employee.getId());
@@ -103,7 +103,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     employeeRepository.deleteById(employee.getId());
 
-    CreateEmployeeResponse response = new CreateEmployeeResponse();
+    var response = new CreateEmployeeResponse();
     response.setId(employee.getId());
 
     return response;
@@ -128,7 +128,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
     employeeRepository.save(employee);
 
-    CreateEmployeeResponse response = new CreateEmployeeResponse();
+    var response = new CreateEmployeeResponse();
     response.setId(employee.getId());
 
     return response;

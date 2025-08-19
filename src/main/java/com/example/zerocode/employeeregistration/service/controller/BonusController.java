@@ -6,6 +6,7 @@ import com.example.zerocode.employeeregistration.service.controller.response.Cre
 import com.example.zerocode.employeeregistration.service.exception.BonusNotFoundException;
 import com.example.zerocode.employeeregistration.service.exception.EmployeeNotFoundException;
 import com.example.zerocode.employeeregistration.service.service.BonusService;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,7 +24,7 @@ public class BonusController {
   private final BonusService bonusService;
 
   @PostMapping(value = "/employees/{employee-id}/bonuses", headers = "version=v1")
-  public CreateBonusResponse add(@RequestBody CreateBonusRequest request,
+  public CreateBonusResponse add(@Valid @RequestBody CreateBonusRequest request,
       @PathVariable("employee-id") Long employeeId) throws EmployeeNotFoundException {
     return bonusService.addBonus(request, employeeId);
   }
@@ -35,7 +36,7 @@ public class BonusController {
   }
 
   @PutMapping(value = "/employees/{employee-id}/bonuses/{bonus-id}", headers = "version=v1")
-  public CreateBonusResponse update(@RequestBody CreateBonusRequest request,
+  public CreateBonusResponse update(@Valid @RequestBody CreateBonusRequest request,
       @PathVariable("employee-id") Long employeeId,
       @PathVariable("bonus-id") Long bonusId)
       throws BonusNotFoundException, EmployeeNotFoundException {

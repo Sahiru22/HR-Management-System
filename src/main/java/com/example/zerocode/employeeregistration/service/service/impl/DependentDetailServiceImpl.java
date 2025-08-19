@@ -38,7 +38,7 @@ public class DependentDetailServiceImpl implements DependentDetailService {
     dependentDetail.setEmployee(employee);
     dependentDetailRepository.save(dependentDetail);
 
-    CreateDependentDetailResponse response = new CreateDependentDetailResponse();
+    var response = new CreateDependentDetailResponse();
     response.setId(dependentDetail.getId());
 
     return response;
@@ -48,7 +48,7 @@ public class DependentDetailServiceImpl implements DependentDetailService {
   @Override
   public List<DependentDetailResponse> getDependentDetails(Long employeeId)
       throws EmployeeNotFoundException {
-    log.info("getting qualification by employee id : {}", employeeId);
+    log.info("getting dependent details by employee id : {}", employeeId);
 
     var employee = employeeRepository.findById(employeeId)
         .orElseThrow(
@@ -62,6 +62,9 @@ public class DependentDetailServiceImpl implements DependentDetailService {
             .name(dependentDetail.getName())
             .relationship(dependentDetail.getRelationship())
             .contactNumber(dependentDetail.getContactNumber())
+            .email(dependentDetail.getEmail())
+            .address(dependentDetail.getAddress())
+            .memo(dependentDetail.getMemo())
             .build())
         .toList();
 
@@ -84,7 +87,7 @@ public class DependentDetailServiceImpl implements DependentDetailService {
     modelMapper.map(request, dependentDetail);
     dependentDetailRepository.save(dependentDetail);
 
-    CreateDependentDetailResponse response = new CreateDependentDetailResponse();
+    var response = new CreateDependentDetailResponse();
     response.setId(dependentDetail.getId());
 
     return response;
@@ -105,7 +108,7 @@ public class DependentDetailServiceImpl implements DependentDetailService {
 
     dependentDetailRepository.delete(dependentDetail);
 
-    CreateDependentDetailResponse response = new CreateDependentDetailResponse();
+    var response = new CreateDependentDetailResponse();
     response.setId(dependentDetail.getId());
 
     return response;

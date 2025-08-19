@@ -6,101 +6,116 @@ import com.example.zerocode.employeeregistration.service.controller.response.Edu
 import com.example.zerocode.employeeregistration.service.exception.EducationQualificationNotFoundException;
 import com.example.zerocode.employeeregistration.service.exception.EmployeeNotFoundException;
 import com.example.zerocode.employeeregistration.service.model.EducationalQualification;
-import com.example.zerocode.employeeregistration.service.model.Employee;
 import com.example.zerocode.employeeregistration.service.repository.EducationalQualificationRepository;
 import com.example.zerocode.employeeregistration.service.repository.EmployeeRepository;
 import com.example.zerocode.employeeregistration.service.service.EducationalQualificationService;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class EducationalQualificationServiceImpl implements EducationalQualificationService {
 
-    private final EmployeeRepository employeeRepository;
-    private final EducationalQualificationRepository educationalQualificationRepository;
+  private final EmployeeRepository employeeRepository;
+  private final EducationalQualificationRepository educationalQualificationRepository;
+  private final ModelMapper modelMapper;
 
-    @Override
-    public CreateEducationalQualificationResponse addQualifications(CreateEducationalQualificationRequest request, Long employeeId) throws EmployeeNotFoundException {
+  @Override
+  public CreateEducationalQualificationResponse addQualifications(
+      CreateEducationalQualificationRequest request, Long employeeId)
+      throws EmployeeNotFoundException {
 
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
+    var employee = employeeRepository.findById(employeeId)
+        .orElseThrow(
+            () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
 
-            EducationalQualification educationalQualification = new EducationalQualification();
+    var educationalQualification = new EducationalQualification();
 
-            educationalQualification.setId(request.getId());
-            educationalQualification.setDegree(request.getDegree());
-            educationalQualification.setDiploma(request.getDiploma());
+    modelMapper.map(request, educationalQualification);
+    educationalQualification.setEmployee(employee);
+    educationalQualificationRepository.save(educationalQualification);
 
-            educationalQualification.setEmployee(employee);
+    var response = new CreateEducationalQualificationResponse();
+    response.setId(educationalQualification.getId());
 
-            educationalQualificationRepository.save(educationalQualification);
+    log.info("successfully adding educational qualifications with employee id : {}", employeeId);
 
-            CreateEducationalQualificationResponse response = new CreateEducationalQualificationResponse();
-            response.setId(educationalQualification.getId());
+    return response;
+  }
 
-            System.out.println("successfully adding educational qualifications with employee id:" + employeeId);
+  @Override
+  public List<EducationalQualificationResponse> getQualificationByEmployeeId(Long employeeId)
+      throws EmployeeNotFoundException {
+    log.info("getting qualification by employee id : {}", employeeId);
 
-            return response;
+    var employee = employeeRepository.findById(employeeId)
+        .orElseThrow(
+            () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
 
-    }
+    List<EducationalQualification> educationalQualifications = educationalQualificationRepository.findByEmployee(
+        employee);
 
-    @Override
-    public List<EducationalQualificationResponse> getQualificationByEmployeeId(Long employeeId) throws EmployeeNotFoundException {
+    return educationalQualifications.stream()
+        .map(educationalQualification -> EducationalQualificationResponse.builder()
+            .id(educationalQualification.getId())
+            .degree(educationalQualification.getDegree())
+            .diploma(educationalQualification.getDiploma())
+            .institutionName(educationalQualification.getInstitutionName())
+            .fieldOfStudy(educationalQualification.getFieldOfStudy())
+            .build())
+        .toList();
+  }
 
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
+  @Override
+  public CreateEducationalQualificationResponse updateQualificationById(
+      CreateEducationalQualificationRequest request, Long employeeId,
+      Long educationalQualificationId)
+      throws EmployeeNotFoundException, EducationQualificationNotFoundException {
+    log.info("updating qualification by employee id : {}", employeeId);
 
-        List<EducationalQualification> educationalQualifications = educationalQualificationRepository.findByEmployee(employee);
+    employeeRepository.findById(employeeId)
+        .orElseThrow(
+            () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
 
-        return educationalQualifications.stream()
-                .map(educationalQualification -> EducationalQualificationResponse.builder()
-                        .id(educationalQualification.getId())
-                        .degree(educationalQualification.getDegree())
-                        .diploma(educationalQualification.getDiploma())
-                        .build())
-                .toList();
-    }
+    var educationalQualification = educationalQualificationRepository.findById(
+            educationalQualificationId)
+        .orElseThrow(() -> new EducationQualificationNotFoundException(
+            "Not found qualification with id:" + educationalQualificationId));
 
-    @Override
-    public CreateEducationalQualificationResponse updateQualificationById(CreateEducationalQualificationRequest request, Long employeeId, Long educationalQualificationId) throws EmployeeNotFoundException, EducationQualificationNotFoundException {
-        System.out.println("update by employee id : " + employeeId);
+    modelMapper.map(request, educationalQualification);
+    educationalQualificationRepository.save(educationalQualification);
 
-        employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
+    var response = new CreateEducationalQualificationResponse();
+    response.setId(educationalQualification.getId());
 
-        EducationalQualification educationalQualification = educationalQualificationRepository.findById(educationalQualificationId)
-                .orElseThrow(() -> new EducationQualificationNotFoundException("Not found qualification with id:" + educationalQualificationId));
+    return response;
+  }
 
-                educationalQualification.setDegree(request.getDegree());
-                educationalQualification.setDiploma(request.getDiploma());
+  @Override
+  public CreateEducationalQualificationResponse deleteQualifications(
+      Long educationalQualificationId, Long employeeId)
+      throws EmployeeNotFoundException, EducationQualificationNotFoundException {
+    log.info("deleting qualification by employee id : {}", employeeId);
 
-                educationalQualificationRepository.save(educationalQualification);
+    employeeRepository.findById(employeeId)
+        .orElseThrow(
+            () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
 
-                CreateEducationalQualificationResponse response = new CreateEducationalQualificationResponse();
-                response.setId(educationalQualification.getId());
+    var educationalQualification = educationalQualificationRepository.findById(
+            educationalQualificationId)
+        .orElseThrow(() -> new EducationQualificationNotFoundException(
+            "Not found qualification with id:" + educationalQualificationId));
 
-                return response;
-    }
+    educationalQualificationRepository.delete(educationalQualification);
 
-    @Override
-    public CreateEducationalQualificationResponse deleteQualifications(Long educationalQualificationId, Long employeeId) throws EmployeeNotFoundException, EducationQualificationNotFoundException {
-        System.out.println("delete qualification with employee id:" + employeeId);
+    var response = new CreateEducationalQualificationResponse();
+    response.setId(educationalQualification.getId());
 
-        employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
-
-        EducationalQualification educationalQualification = educationalQualificationRepository.findById(educationalQualificationId)
-                .orElseThrow(() -> new EducationQualificationNotFoundException("Not found qualification with id:" + educationalQualificationId));
-
-        educationalQualificationRepository.delete(educationalQualification);
-
-        CreateEducationalQualificationResponse response = new CreateEducationalQualificationResponse();
-        response.setId(educationalQualification.getId());
-
-        return response;
-    }
+    return response;
+  }
 }
 

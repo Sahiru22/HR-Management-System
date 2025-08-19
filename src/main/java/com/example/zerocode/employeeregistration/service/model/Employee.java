@@ -68,9 +68,6 @@ public class Employee {
   private Department department;
 
   @OneToMany(mappedBy = "employee")
-  private List<EducationalQualification> educationalQualifications;
-
-  @OneToMany(mappedBy = "employee")
   private List<WorkHistory> workHistories;
 
   @OneToMany(mappedBy = "employee")
