@@ -28,5 +28,4 @@ public class AllowanceResponse {
 
   @NotNull
   private String allowanceDate;
-
 }

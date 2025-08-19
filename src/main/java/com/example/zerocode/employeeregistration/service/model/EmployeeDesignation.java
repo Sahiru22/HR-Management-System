@@ -18,6 +18,6 @@ public class EmployeeDesignation {
     @ManyToOne
     private Employee employee;
 
-    @ManyToOne
-    private Department department;
+//    @ManyToOne
+//    private Department department;
 }
