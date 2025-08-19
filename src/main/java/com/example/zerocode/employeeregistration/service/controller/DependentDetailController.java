@@ -42,7 +42,6 @@ public class DependentDetailController {
       @PathVariable("dependent-details-id") Long dependentDetailsId)
       throws EmployeeNotFoundException, DependentDetailsNotFoundException {
     return dependentDetailService.updateDependentDetails(request, employeeId, dependentDetailsId);
-
   }
 
   @DeleteMapping(value = "/employees/{employee-id}/dependent-details/{dependent-details-id}", headers = "version=v1")
@@ -50,6 +49,5 @@ public class DependentDetailController {
       @PathVariable("dependent-details-id") Long dependentDetailsId)
       throws EmployeeNotFoundException, DependentDetailsNotFoundException {
     return dependentDetailService.deleteDependent(employeeId, dependentDetailsId);
-
   }
 }
