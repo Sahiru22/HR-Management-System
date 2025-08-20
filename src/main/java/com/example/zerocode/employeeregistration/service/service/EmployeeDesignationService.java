@@ -6,16 +6,20 @@ import com.example.zerocode.employeeregistration.service.controller.response.Emp
 import com.example.zerocode.employeeregistration.service.exception.DepartmentNotFoundException;
 import com.example.zerocode.employeeregistration.service.exception.EmployeeDesignationNotFoundException;
 import com.example.zerocode.employeeregistration.service.exception.EmployeeNotFoundException;
-
 import java.util.List;
 
 public interface EmployeeDesignationService {
 
-    CreateEmployeeDesignationResponse addEmployeeDesignation(CreateEmployeeDesignationRequest request, Long employeeId, Long departmentId) throws EmployeeNotFoundException, DepartmentNotFoundException;
+  CreateEmployeeDesignationResponse addEmployeeDesignation(CreateEmployeeDesignationRequest request,
+      Long employeeId) throws EmployeeNotFoundException, DepartmentNotFoundException;
 
-    List<EmployeeDesignationResponse> getEmployeeDesignation(Long employeeId) throws EmployeeNotFoundException;
+  List<EmployeeDesignationResponse> getEmployeeDesignation(Long employeeId)
+      throws EmployeeNotFoundException;
 
-    CreateEmployeeDesignationResponse updateEmployeeDesignation(CreateEmployeeDesignationRequest request, Long employeeId, Long employeeDesignationId) throws EmployeeNotFoundException, EmployeeDesignationNotFoundException;
+  CreateEmployeeDesignationResponse updateEmployeeDesignation(
+      CreateEmployeeDesignationRequest request, Long employeeId, Long employeeDesignationId)
+      throws EmployeeNotFoundException, EmployeeDesignationNotFoundException, DepartmentNotFoundException;
 
-    CreateEmployeeDesignationResponse deleteEmployeeDesignation(Long employeeDesignationId, Long employeeId) throws EmployeeNotFoundException, EmployeeDesignationNotFoundException;
+  CreateEmployeeDesignationResponse deleteEmployeeDesignation(Long employeeDesignationId,
+      Long employeeId) throws EmployeeNotFoundException, EmployeeDesignationNotFoundException;
 }

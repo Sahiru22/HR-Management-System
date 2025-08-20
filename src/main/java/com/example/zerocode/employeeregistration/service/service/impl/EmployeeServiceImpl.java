@@ -58,14 +58,6 @@ public class EmployeeServiceImpl implements EmployeeService {
             .id(employee.getId())
             .firstName(employee.getFirstName())
             .lastName(employee.getLastName())
-            .age(employee.getAge())
-            .address(employee.getAddress())
-            .gender(employee.getGender())
-            .email(employee.getEmail())
-            .bloodGroup(employee.getBloodGroup())
-            .maritalStatus(employee.getMaritalStatus())
-            .phoneNumber(employee.getPhoneNumber())
-            .birthDate(employee.getBirthDate())
             .build())
         .toList();
   }
@@ -82,14 +74,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         .id(employee.getId())
         .firstName(employee.getFirstName())
         .lastName(employee.getLastName())
-        .age(employee.getAge())
-        .address(employee.getAddress())
-        .gender(employee.getGender())
-        .email(employee.getEmail())
-        .bloodGroup(employee.getBloodGroup())
-        .maritalStatus(employee.getMaritalStatus())
-        .phoneNumber(employee.getPhoneNumber())
-        .birthDate(employee.getBirthDate())
         .build();
   }
 
@@ -151,14 +135,6 @@ public class EmployeeServiceImpl implements EmployeeService {
             .id(employee.getId())
             .firstName(employee.getFirstName())
             .lastName(employee.getLastName())
-            .age(employee.getAge())
-            .address(employee.getAddress())
-            .gender(employee.getGender())
-            .email(employee.getEmail())
-            .bloodGroup(employee.getBloodGroup())
-            .maritalStatus(employee.getMaritalStatus())
-            .phoneNumber(employee.getPhoneNumber())
-            .birthDate(employee.getBirthDate())
             .build())
         .toList();
   }
