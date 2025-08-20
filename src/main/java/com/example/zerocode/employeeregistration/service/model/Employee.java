@@ -75,9 +75,6 @@ public class Employee {
   private List<WorkHistory> workHistories;
 
   @OneToMany(mappedBy = "employee")
-  private List<IssuedItem> issuedItems;
-
-  @OneToMany(mappedBy = "employee")
   private List<Leave> leaves;
 
   @OneToOne(mappedBy = "employee")

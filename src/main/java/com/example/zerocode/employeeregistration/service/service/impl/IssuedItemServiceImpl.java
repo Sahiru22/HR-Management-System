@@ -5,103 +5,106 @@ import com.example.zerocode.employeeregistration.service.controller.response.Cre
 import com.example.zerocode.employeeregistration.service.controller.response.IssuedItemResponse;
 import com.example.zerocode.employeeregistration.service.exception.EmployeeNotFoundException;
 import com.example.zerocode.employeeregistration.service.exception.IssuedItemNotFoundException;
-import com.example.zerocode.employeeregistration.service.model.Employee;
 import com.example.zerocode.employeeregistration.service.model.IssuedItem;
 import com.example.zerocode.employeeregistration.service.repository.EmployeeRepository;
 import com.example.zerocode.employeeregistration.service.repository.IssuedItemRepository;
 import com.example.zerocode.employeeregistration.service.service.IssuedItemService;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class IssuedItemServiceImpl implements IssuedItemService {
 
-    private final IssuedItemRepository issuedItemRepository;
-    private final EmployeeRepository employeeRepository;
+  private final IssuedItemRepository issuedItemRepository;
+  private final EmployeeRepository employeeRepository;
+  private final ModelMapper modelMapper;
 
-    @Override
-    public CreateIssuedItemResponse addIssuedItem(CreateIssuedItemRequest request, Long employeeId) throws EmployeeNotFoundException {
-        System.out.println("successfully adding issued items with employee id:" + employeeId);
+  @Override
+  public CreateIssuedItemResponse addIssuedItem(CreateIssuedItemRequest request, Long employeeId)
+      throws EmployeeNotFoundException {
+    log.info("successfully adding issued items with employee id:{}", employeeId);
 
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
+    var employee = employeeRepository.findById(employeeId)
+        .orElseThrow(
+            () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
 
-            IssuedItem issuedItem = new IssuedItem();
+    var issuedItem = new IssuedItem();
+    modelMapper.map(request, issuedItem);
+    issuedItem.setEmployee(employee);
+    issuedItemRepository.save(issuedItem);
 
-            issuedItem.setId(request.getId());
-            issuedItem.setItemName(request.getItemName());
-            issuedItem.setIssuedDate(request.getIssuedDate());
-            issuedItem.setReturnDate(request.getReturnDate());
-            
-            issuedItem.setEmployee(employee);
-            
-            issuedItemRepository.save(issuedItem);
+    var response = new CreateIssuedItemResponse();
+    response.setId(issuedItem.getId());
 
-            CreateIssuedItemResponse response = new CreateIssuedItemResponse();
-            response.setId(issuedItem.getId());
-            
-            return response;
-    }
+    return response;
+  }
 
-    @Override
-    public List<IssuedItemResponse> getIssuedItem(Long employeeId) throws EmployeeNotFoundException {
-        System.out.println("getting issuedItems with employeeId : " + employeeId);
+  @Override
+  public List<IssuedItemResponse> getIssuedItem(Long employeeId) throws EmployeeNotFoundException {
+    log.info("getting issuedItems with employeeId : {}", employeeId);
 
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
+    var employee = employeeRepository.findById(employeeId)
+        .orElseThrow(
+            () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
 
-        List<IssuedItem> issuedItems = issuedItemRepository.findByEmployee(employee);
+    List<IssuedItem> issuedItems = issuedItemRepository.findByEmployee(employee);
 
-        return issuedItems.stream()
-                .map(issuedItem -> IssuedItemResponse.builder()
-                        .id(issuedItem.getId())
-                        .itemName(issuedItem.getItemName())
-                        .issuedDate(issuedItem.getIssuedDate())
-                        .returnDate(issuedItem.getReturnDate())
-                        .build())
-                .toList();
-    }
+    return issuedItems.stream()
+        .map(issuedItem -> IssuedItemResponse.builder()
+            .id(issuedItem.getId())
+            .itemName(issuedItem.getItemName())
+            .issuedDate(issuedItem.getIssuedDate())
+            .returnDate(issuedItem.getReturnDate())
+            .build())
+        .toList();
+  }
 
-    @Override
-    public CreateIssuedItemResponse updateIssuedItem(CreateIssuedItemRequest request, Long employeeId, Long issuedItemId) throws EmployeeNotFoundException, IssuedItemNotFoundException {
-        System.out.println("update items with employeeId : " + employeeId);
+  @Override
+  public CreateIssuedItemResponse updateIssuedItem(CreateIssuedItemRequest request, Long employeeId,
+      Long issuedItemId) throws EmployeeNotFoundException, IssuedItemNotFoundException {
+    log.info("updating issuedItems with employeeId : {}", employeeId);
 
-        employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
+    var employee = employeeRepository.findById(employeeId)
+        .orElseThrow(
+            () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
 
-        IssuedItem issuedItem = issuedItemRepository.findById(issuedItemId)
-                        .orElseThrow(() -> new IssuedItemNotFoundException("Not found issued item with id:" + issuedItemId));
+    var issuedItem = issuedItemRepository.findById(issuedItemId)
+        .orElseThrow(
+            () -> new IssuedItemNotFoundException("Not found issued item with id:" + issuedItemId));
 
-                issuedItem.setItemName(request.getItemName());
-                issuedItem.setIssuedDate(request.getIssuedDate());
-                issuedItem.setReturnDate(request.getReturnDate());
+    modelMapper.map(request, issuedItem);
+    issuedItem.setEmployee(employee);
+    issuedItemRepository.save(issuedItem);
 
-                issuedItemRepository.save(issuedItem);
+    var response = new CreateIssuedItemResponse();
+    response.setId(issuedItem.getId());
 
-                CreateIssuedItemResponse response = new CreateIssuedItemResponse();
-                response.setId(issuedItem.getId());
+    return response;
+  }
 
-                return response;
-    }
+  @Override
+  public CreateIssuedItemResponse deleteIssuedItem(Long employeeId, Long issuedItemId)
+      throws EmployeeNotFoundException, IssuedItemNotFoundException {
+    log.info("deleting issuedItems with employeeId : {}", employeeId);
 
-    @Override
-    public CreateIssuedItemResponse deleteIssuedItem(Long employeeId, Long issuedItemId) throws EmployeeNotFoundException, IssuedItemNotFoundException {
-        System.out.println("delete items with employeeId : " + employeeId);
+    employeeRepository.findById(employeeId)
+        .orElseThrow(
+            () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
 
-        employeeRepository.findById(employeeId)
-                        .orElseThrow(() -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
+    var issuedItem = issuedItemRepository.findById(issuedItemId)
+        .orElseThrow(
+            () -> new IssuedItemNotFoundException("Not found issued item with id:" + issuedItemId));
 
-        IssuedItem issuedItem = issuedItemRepository.findById(issuedItemId)
-                        .orElseThrow(() -> new IssuedItemNotFoundException("Not found issued item with id:" + issuedItemId));
+    issuedItemRepository.delete(issuedItem);
 
-        issuedItemRepository.delete(issuedItem);
+    var response = new CreateIssuedItemResponse();
+    response.setId(issuedItem.getId());
 
-        CreateIssuedItemResponse response = new CreateIssuedItemResponse();
-        response.setId(issuedItem.getId());
-
-        return response;
-    }
+    return response;
+  }
 }
