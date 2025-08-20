@@ -77,7 +77,7 @@ public class EducationalQualificationServiceImpl implements EducationalQualifica
       throws EmployeeNotFoundException, EducationQualificationNotFoundException {
     log.info("updating qualification by employee id : {}", employeeId);
 
-    employeeRepository.findById(employeeId)
+    var employee = employeeRepository.findById(employeeId)
         .orElseThrow(
             () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
 
@@ -87,6 +87,7 @@ public class EducationalQualificationServiceImpl implements EducationalQualifica
             "Not found qualification with id:" + educationalQualificationId));
 
     modelMapper.map(request, educationalQualification);
+    educationalQualification.setEmployee(employee);
     educationalQualificationRepository.save(educationalQualification);
 
     var response = new CreateEducationalQualificationResponse();

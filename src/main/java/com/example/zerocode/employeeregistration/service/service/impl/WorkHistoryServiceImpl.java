@@ -5,110 +5,111 @@ import com.example.zerocode.employeeregistration.service.controller.response.Cre
 import com.example.zerocode.employeeregistration.service.controller.response.WorkHistoryResponse;
 import com.example.zerocode.employeeregistration.service.exception.EmployeeNotFoundException;
 import com.example.zerocode.employeeregistration.service.exception.WorkHistoryNotFoundException;
-import com.example.zerocode.employeeregistration.service.model.Employee;
 import com.example.zerocode.employeeregistration.service.model.WorkHistory;
 import com.example.zerocode.employeeregistration.service.repository.EmployeeRepository;
 import com.example.zerocode.employeeregistration.service.repository.WorkHistoryRepository;
 import com.example.zerocode.employeeregistration.service.service.WorkHistoryService;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class WorkHistoryServiceImpl implements WorkHistoryService {
 
-    private final WorkHistoryRepository workHistoryRepository;
-    private final EmployeeRepository employeeRepository;
+  private final WorkHistoryRepository workHistoryRepository;
+  private final EmployeeRepository employeeRepository;
+  private final ModelMapper modelMapper;
 
-    @Override
-    public CreateWorkHistoryResponse addWorkHistory(CreateWorkHistoryRequest request, Long employeeId) throws EmployeeNotFoundException {
-        System.out.println("successfully added work history with employee id " + employeeId);
+  @Override
+  public CreateWorkHistoryResponse addWorkHistory(CreateWorkHistoryRequest request, Long employeeId)
+      throws EmployeeNotFoundException {
+    log.info("successfully added work history with employee id {}", employeeId);
 
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException("Not found employee with id: " + employeeId));
+    var employee = employeeRepository.findById(employeeId)
+        .orElseThrow(
+            () -> new EmployeeNotFoundException("Not found employee with id: " + employeeId));
 
-            WorkHistory workHistory = new WorkHistory();
+    var workHistory = new WorkHistory();
+    modelMapper.map(request, workHistory);
+    workHistory.setEmployee(employee);
+    workHistoryRepository.save(workHistory);
 
-            workHistory.setId(request.getId());
-            workHistory.setWorkPlace(request.getWorkPlace());
-            workHistory.setJobTitle(request.getJobTitle());
-            workHistory.setProject(request.getProject());
-            workHistory.setStartDate(request.getStartDate());
-            workHistory.setEndDate(request.getEndDate());
+    var response = new CreateWorkHistoryResponse();
+    response.setId(workHistory.getId());
 
-            workHistory.setEmployee(employee);
+    return response;
+  }
 
-            workHistoryRepository.save(workHistory);
+  @Override
+  public List<WorkHistoryResponse> getWorkHistory(Long employeeId)
+      throws EmployeeNotFoundException {
+    log.info("successfully retrieved work history with employeeId : {}", employeeId);
 
-            CreateWorkHistoryResponse response = new CreateWorkHistoryResponse();
-            response.setId(workHistory.getId());
+    var employee = employeeRepository.findById(employeeId)
+        .orElseThrow(
+            () -> new EmployeeNotFoundException("Not found employee with id: " + employeeId));
 
-            return response;
-    }
+    List<WorkHistory> workHistories = workHistoryRepository.findByEmployee(employee);
 
-    @Override
-    public List<WorkHistoryResponse> getWorkHistory(Long employeeId) throws EmployeeNotFoundException {
-        System.out.println("getting work history with employeeId : " + employeeId);
-
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException("Not found employee with id: " + employeeId));
-
-        List<WorkHistory> workHistories = workHistoryRepository.findByEmployee(employee);
-
-        return workHistories.stream()
-                .map(workHistory -> WorkHistoryResponse.builder()
-                        .id(workHistory.getId())
-                        .workPlace(workHistory.getWorkPlace())
-                        .jobTitle(workHistory.getJobTitle())
-                        .project(workHistory.getProject())
-                        .startDate(workHistory.getStartDate())
-                        .endDate(workHistory.getEndDate())
-                        .build())
-                .toList();
-    }
+    return workHistories.stream()
+        .map(workHistory -> WorkHistoryResponse.builder()
+            .id(workHistory.getId())
+            .workPlace(workHistory.getWorkPlace())
+            .jobTitle(workHistory.getJobTitle())
+            .project(workHistory.getProject())
+            .startDate(workHistory.getStartDate())
+            .endDate(workHistory.getEndDate())
+            .build())
+        .toList();
+  }
 
 
-    @Override
-    public CreateWorkHistoryResponse updateWorkHistory(CreateWorkHistoryRequest request, Long employeeId, Long workHistoryId) throws EmployeeNotFoundException, WorkHistoryNotFoundException {
-        System.out.println("update work history with employee id : " + employeeId);
+  @Override
+  public CreateWorkHistoryResponse updateWorkHistory(CreateWorkHistoryRequest request,
+      Long employeeId, Long workHistoryId)
+      throws EmployeeNotFoundException, WorkHistoryNotFoundException {
+    log.info("successfully updated work history with employee id : {}", employeeId);
 
-        employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException("Not found employee with id: " + employeeId));
+    var employee = employeeRepository.findById(employeeId)
+        .orElseThrow(
+            () -> new EmployeeNotFoundException("Not found employee with id: " + employeeId));
 
-        WorkHistory workHistory = workHistoryRepository.findById(workHistoryId)
-                        .orElseThrow(() -> new WorkHistoryNotFoundException("Not found work history with id: " + workHistoryId));
+    var workHistory = workHistoryRepository.findById(workHistoryId)
+        .orElseThrow(() -> new WorkHistoryNotFoundException(
+            "Not found work history with id: " + workHistoryId));
 
-                workHistory.setWorkPlace(request.getWorkPlace());
-                workHistory.setJobTitle(request.getJobTitle());
-                workHistory.setProject(request.getProject());
-                workHistory.setStartDate(request.getStartDate());
-                workHistory.setEndDate(request.getEndDate());
+    modelMapper.map(request, workHistory);
+    workHistory.setEmployee(employee);
+    workHistoryRepository.save(workHistory);
 
-                workHistoryRepository.save(workHistory);
+    var response = new CreateWorkHistoryResponse();
+    response.setId(workHistory.getId());
 
-                CreateWorkHistoryResponse response = new CreateWorkHistoryResponse();
-                response.setId(workHistory.getId());
+    return response;
+  }
 
-                return response;
-    }
+  @Override
+  public CreateWorkHistoryResponse deleteWorkHistory(Long employeeId, Long workHistoryId)
+      throws EmployeeNotFoundException, WorkHistoryNotFoundException {
+    log.info("successfully deleted work history with employee id : {}", employeeId);
 
-    @Override
-    public CreateWorkHistoryResponse deleteWorkHistory(Long employeeId, Long workHistoryId) throws EmployeeNotFoundException, WorkHistoryNotFoundException {
-        System.out.println("delete work history with employee id : " + employeeId);
+    employeeRepository.findById(employeeId)
+        .orElseThrow(
+            () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
 
-        employeeRepository.findById(employeeId)
-                        .orElseThrow(() -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
+    var workHistory = workHistoryRepository.findById(workHistoryId)
+        .orElseThrow(() -> new WorkHistoryNotFoundException(
+            "Not found work history with id:" + workHistoryId));
 
-        WorkHistory workHistory = workHistoryRepository.findById(workHistoryId)
-                        .orElseThrow(() -> new WorkHistoryNotFoundException("Not found work history with id:" + workHistoryId));
+    workHistoryRepository.delete(workHistory);
 
-        workHistoryRepository.delete(workHistory);
+    var response = new CreateWorkHistoryResponse();
+    response.setId(workHistory.getId());
 
-        CreateWorkHistoryResponse response = new CreateWorkHistoryResponse();
-        response.setId(workHistory.getId());
-
-        return  response;
-    }
+    return response;
+  }
 }

@@ -74,7 +74,7 @@ public class DependentDetailServiceImpl implements DependentDetailService {
       throws EmployeeNotFoundException, DependentDetailsNotFoundException {
     log.info("update by employee id : {}", employeeId);
 
-    employeeRepository.findById(employeeId)
+    var employee = employeeRepository.findById(employeeId)
         .orElseThrow(
             () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
 
@@ -83,6 +83,7 @@ public class DependentDetailServiceImpl implements DependentDetailService {
             "Not found dependent details with id:" + dependentDetailsId));
 
     modelMapper.map(request, dependentDetail);
+    dependentDetail.setEmployee(employee);
     dependentDetailRepository.save(dependentDetail);
 
     var response = new CreateDependentDetailResponse();

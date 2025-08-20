@@ -16,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-
 @Slf4j
 @Service
 @AllArgsConstructor
@@ -73,7 +72,7 @@ public class EmergencyContactServiceImpl implements EmergencyContactService {
       throws EmployeeNotFoundException, EmergencyContactNotFoundException {
     log.info("updating emergency contact with employeeId : {}", employeeId);
 
-    employeeRepository.findById(employeeId)
+    var employee = employeeRepository.findById(employeeId)
         .orElseThrow(
             () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
 
@@ -82,6 +81,7 @@ public class EmergencyContactServiceImpl implements EmergencyContactService {
             "Not found emergency contacts with id:" + emergencyContactId));
 
     modelMapper.map(request, emergencyContact);
+    emergencyContact.setEmployee(employee);
     emergencyContactRepository.save(emergencyContact);
 
     var response = new CreateEmergencyContactResponse();

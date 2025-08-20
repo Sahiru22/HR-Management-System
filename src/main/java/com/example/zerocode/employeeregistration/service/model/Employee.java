@@ -1,13 +1,13 @@
 package com.example.zerocode.employeeregistration.service.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Email;
@@ -15,7 +15,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
-import java.util.List;
 import lombok.Data;
 
 @Data
@@ -43,6 +42,7 @@ public class Employee {
   private String address;
 
   @NotNull
+  @Enumerated(EnumType.STRING)
   private Gender gender;
 
   @NotBlank
@@ -53,6 +53,7 @@ public class Employee {
   private String bloodGroup;
 
   @NotNull
+  @Enumerated(EnumType.STRING)
   private MaritalStatus maritalStatus;
 
   @NotNull
@@ -66,19 +67,4 @@ public class Employee {
   @ManyToOne(optional = false)
   @JoinColumn(name = "department_id")
   private Department department;
-
-  @OneToMany(mappedBy = "employee")
-  private List<WorkHistory> workHistories;
-
-  @OneToMany(mappedBy = "employee")
-  private List<IssuedItem> issuedItems;
-
-  @OneToMany(mappedBy = "employee")
-  private List<Leave> leaves;
-
-  @OneToOne(mappedBy = "employee")
-  private Salary salary;
-
-  @OneToMany(mappedBy = "employee")
-  private List<Insurance> insurances;
 }

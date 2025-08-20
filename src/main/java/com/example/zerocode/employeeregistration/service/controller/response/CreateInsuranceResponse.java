@@ -4,5 +4,6 @@ import lombok.Data;
 
 @Data
 public class CreateInsuranceResponse {
-    private Long id;
+
+  private Long id;
 }
