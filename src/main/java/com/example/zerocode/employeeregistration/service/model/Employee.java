@@ -1,6 +1,8 @@
 package com.example.zerocode.employeeregistration.service.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -43,6 +45,7 @@ public class Employee {
   private String address;
 
   @NotNull
+  @Enumerated(EnumType.STRING)
   private Gender gender;
 
   @NotBlank
@@ -53,6 +56,7 @@ public class Employee {
   private String bloodGroup;
 
   @NotNull
+  @Enumerated(EnumType.STRING)
   private MaritalStatus maritalStatus;
 
   @NotNull
@@ -78,7 +82,4 @@ public class Employee {
 
   @OneToOne(mappedBy = "employee")
   private Salary salary;
-
-  @OneToMany(mappedBy = "employee")
-  private List<Insurance> insurances;
 }

@@ -5,107 +5,108 @@ import com.example.zerocode.employeeregistration.service.controller.response.Cre
 import com.example.zerocode.employeeregistration.service.controller.response.InsuranceResponse;
 import com.example.zerocode.employeeregistration.service.exception.EmployeeNotFoundException;
 import com.example.zerocode.employeeregistration.service.exception.InsuranceNotFoundException;
-import com.example.zerocode.employeeregistration.service.model.Employee;
 import com.example.zerocode.employeeregistration.service.model.Insurance;
 import com.example.zerocode.employeeregistration.service.repository.EmployeeRepository;
 import com.example.zerocode.employeeregistration.service.repository.InsuranceRepository;
 import com.example.zerocode.employeeregistration.service.service.InsuranceService;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class InsuranceServiceImpl implements InsuranceService {
 
-    private final InsuranceRepository insuranceRepository;
-    private final EmployeeRepository employeeRepository;
+  private final InsuranceRepository insuranceRepository;
+  private final EmployeeRepository employeeRepository;
+  private final ModelMapper modelMapper;
 
-    @Override
-    public CreateInsuranceResponse addInsurance(CreateInsuranceRequest request, Long employeeId) throws EmployeeNotFoundException {
-        System.out.println("successfully adding insurance with employee id:" + employeeId);
+  @Override
+  public CreateInsuranceResponse addInsurance(CreateInsuranceRequest request, Long employeeId)
+      throws EmployeeNotFoundException {
+    log.info("successfully adding insurance with employee id:{}", employeeId);
 
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
+    var employee = employeeRepository.findById(employeeId)
+        .orElseThrow(
+            () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
 
-            Insurance insurance = new Insurance();
+    var insurance = new Insurance();
+    modelMapper.map(request, insurance);
+    insurance.setEmployee(employee);
+    insuranceRepository.save(insurance);
 
-            insurance.setId(request.getId());
-            insurance.setInsuranceType(request.getInsuranceType());
-            insurance.setInsuranceFee(request.getInsuranceFee());
-            insurance.setPeriod(request.getPeriod());
-            insurance.setMonthlyDeductedAmount(request.getMonthlyDeductedAmount());
+    var response = new CreateInsuranceResponse();
+    response.setId(insurance.getId());
 
-            insurance.setEmployee(employee);
+    return response;
+  }
 
-            insuranceRepository.save(insurance);
+  @Override
+  public List<InsuranceResponse> getInsurance(Long employeeId) throws EmployeeNotFoundException {
+    log.info("getting insurance by employee id : {}", employeeId);
 
-            CreateInsuranceResponse response = new CreateInsuranceResponse();
-            response.setId(insurance.getId());
+    var employee = employeeRepository.findById(employeeId)
+        .orElseThrow(
+            () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
 
-            return  response;
-    }
+    List<Insurance> insurances = insuranceRepository.findByEmployee(employee);
 
-    @Override
-    public List<InsuranceResponse> getInsurance(Long employeeId) throws EmployeeNotFoundException {
-        System.out.println("getting insurance by employee id : " + employeeId);
+    return insurances.stream()
+        .map(insurance -> InsuranceResponse.builder()
+            .id(insurance.getId())
+            .insuranceType(insurance.getInsuranceType())
+            .insuranceFee(insurance.getInsuranceFee())
+            .period(insurance.getPeriod())
+            .monthlyDeductedAmount(insurance.getMonthlyDeductedAmount())
+            .build())
+        .toList();
 
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
+  }
 
-        List<Insurance> insurances = insuranceRepository.findByEmployee(employee);
+  @Override
+  public CreateInsuranceResponse updateInsurance(CreateInsuranceRequest request, Long employeeId,
+      Long insuranceId) throws EmployeeNotFoundException, InsuranceNotFoundException {
+    log.info("update insurance by employee id : {}", employeeId);
 
-        return insurances.stream()
-                .map(insurance -> InsuranceResponse.builder()
-                        .id(insurance.getId())
-                        .insuranceType(insurance.getInsuranceType())
-                        .insuranceFee(insurance.getInsuranceFee())
-                        .period(insurance.getPeriod())
-                        .monthlyDeductedAmount(insurance.getMonthlyDeductedAmount())
-                        .build())
-                .toList();
+    var employee = employeeRepository.findById(employeeId)
+        .orElseThrow(
+            () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
 
-    }
+    var insurance = insuranceRepository.findById(insuranceId)
+        .orElseThrow(
+            () -> new InsuranceNotFoundException("Not found insurance with id:" + insuranceId));
 
-    @Override
-    public CreateInsuranceResponse updateInsurance(CreateInsuranceRequest request, Long employeeId, Long insuranceId) throws EmployeeNotFoundException, InsuranceNotFoundException {
-        System.out.println("update insurance by employee id : " + employeeId);
+    modelMapper.map(request, insurance);
+    insurance.setEmployee(employee);
+    insuranceRepository.save(insurance);
 
-        employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
+    var response = new CreateInsuranceResponse();
+    response.setId(insurance.getId());
 
-        Insurance insurance = insuranceRepository.findById(insuranceId)
-                .orElseThrow(() -> new InsuranceNotFoundException("Not found insurance with id:" + insuranceId));
+    return response;
+  }
 
-                insurance.setInsuranceType(request.getInsuranceType());
-                insurance.setInsuranceFee(request.getInsuranceFee());
-                insurance.setPeriod(request.getPeriod());
-                insurance.setMonthlyDeductedAmount(request.getMonthlyDeductedAmount());
+  @Override
+  public CreateInsuranceResponse deleteInsurance(Long employeeId, Long insuranceId)
+      throws EmployeeNotFoundException, InsuranceNotFoundException {
+    log.info("delete insurance by employee id : {}", employeeId);
 
-                insuranceRepository.save(insurance);
+    employeeRepository.findById(employeeId)
+        .orElseThrow(
+            () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
 
-                CreateInsuranceResponse response = new CreateInsuranceResponse();
-                response.setId(insurance.getId());
+    var insurance = insuranceRepository.findById(insuranceId)
+        .orElseThrow(
+            () -> new InsuranceNotFoundException("Not found insurance with id:" + insuranceId));
 
-                return response;
-    }
+    insuranceRepository.delete(insurance);
 
-    @Override
-    public CreateInsuranceResponse deleteInsurance(Long employeeId, Long insuranceId) throws EmployeeNotFoundException, InsuranceNotFoundException {
-        System.out.println("delete insurance by employee id : " + employeeId);
+    var response = new CreateInsuranceResponse();
+    response.setId(insurance.getId());
 
-        employeeRepository.findById(employeeId)
-                        .orElseThrow(() -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
-
-        Insurance insurance = insuranceRepository.findById(insuranceId)
-                        .orElseThrow(() -> new InsuranceNotFoundException("Not found insurance with id:" + insuranceId));
-
-        insuranceRepository.delete(insurance);
-
-        CreateInsuranceResponse response = new CreateInsuranceResponse();
-        response.setId(insurance.getId());
-
-        return response;
-    }
+    return response;
+  }
 }

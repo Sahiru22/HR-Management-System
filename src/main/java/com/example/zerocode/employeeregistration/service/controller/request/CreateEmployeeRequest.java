@@ -2,6 +2,8 @@ package com.example.zerocode.employeeregistration.service.controller.request;
 
 import com.example.zerocode.employeeregistration.service.model.Gender;
 import com.example.zerocode.employeeregistration.service.model.MaritalStatus;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -33,6 +35,7 @@ public class CreateEmployeeRequest {
   private String address;
 
   @NotNull
+  @Enumerated(EnumType.STRING)
   private Gender gender;
 
   @NotBlank
@@ -43,6 +46,7 @@ public class CreateEmployeeRequest {
   private String bloodGroup;
 
   @NotNull
+  @Enumerated(EnumType.STRING)
   private MaritalStatus maritalStatus;
 
   @NotNull

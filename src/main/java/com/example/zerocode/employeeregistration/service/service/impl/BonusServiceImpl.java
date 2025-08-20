@@ -69,7 +69,7 @@ public class BonusServiceImpl implements BonusService {
       throws EmployeeNotFoundException, BonusNotFoundException {
     log.info("update bonus by employee id : {}", employeeId);
 
-    employeeRepository.findById(employeeId)
+    var employee = employeeRepository.findById(employeeId)
         .orElseThrow(
             () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
 
@@ -77,6 +77,7 @@ public class BonusServiceImpl implements BonusService {
         .orElseThrow(() -> new BonusNotFoundException("Not found bonus with id:" + bonusId));
 
     modelMapper.map(request, bonus);
+    bonus.setEmployee(employee);
     bonusRepository.save(bonus);
 
     var response = new CreateBonusResponse();
