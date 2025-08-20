@@ -62,6 +62,11 @@
       <artifactId>flyway-mysql</artifactId>
       <version>9.21.2</version>
     </dependency>
+    <dependency>
+      <groupId>org.hibernate.orm</groupId>
+      <artifactId>hibernate-envers</artifactId>
+      <version>6.4.4.Final</version>
+    </dependency>
   </dependencies>
 
   <build>
