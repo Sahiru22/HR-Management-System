@@ -5,17 +5,19 @@ import com.example.zerocode.employeeregistration.service.controller.response.Cre
 import com.example.zerocode.employeeregistration.service.controller.response.SalaryResponse;
 import com.example.zerocode.employeeregistration.service.exception.EmployeeNotFoundException;
 import com.example.zerocode.employeeregistration.service.exception.SalaryNotFoundException;
-
 import java.util.List;
 
 public interface SalaryService {
-    CreateSalaryResponse addSalary(CreateSalaryRequest request, Long employeeId) throws EmployeeNotFoundException;
 
-    SalaryResponse getSalaryById(Long employeeId) throws EmployeeNotFoundException;
+  CreateSalaryResponse addSalary(CreateSalaryRequest request, Long employeeId)
+      throws EmployeeNotFoundException;
 
-    List<SalaryResponse> getAllSalaries();
+  SalaryResponse getSalaryById(Long employeeId) throws EmployeeNotFoundException;
 
-    CreateSalaryResponse updateSalary(CreateSalaryRequest request, Long employeeId, Long salaryId) throws EmployeeNotFoundException, SalaryNotFoundException;
+  List<SalaryResponse> getAllSalaries();
 
-    CreateSalaryResponse deleteSalary(Long employeeId, Long salaryId) throws SalaryNotFoundException;
+  CreateSalaryResponse updateSalary(CreateSalaryRequest request, Long employeeId, Long salaryId)
+      throws EmployeeNotFoundException, SalaryNotFoundException;
+
+  CreateSalaryResponse deleteSalary(Long employeeId, Long salaryId) throws SalaryNotFoundException;
 }

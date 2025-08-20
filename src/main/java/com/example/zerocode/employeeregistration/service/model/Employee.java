@@ -9,7 +9,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Email;
@@ -73,7 +72,4 @@ public class Employee {
 
   @OneToMany(mappedBy = "employee")
   private List<WorkHistory> workHistories;
-
-  @OneToOne(mappedBy = "employee")
-  private Salary salary;
 }

@@ -5,119 +5,122 @@ import com.example.zerocode.employeeregistration.service.controller.response.Cre
 import com.example.zerocode.employeeregistration.service.controller.response.SalaryResponse;
 import com.example.zerocode.employeeregistration.service.exception.EmployeeNotFoundException;
 import com.example.zerocode.employeeregistration.service.exception.SalaryNotFoundException;
-import com.example.zerocode.employeeregistration.service.model.Employee;
 import com.example.zerocode.employeeregistration.service.model.Salary;
 import com.example.zerocode.employeeregistration.service.repository.EmployeeRepository;
 import com.example.zerocode.employeeregistration.service.repository.SalaryRepository;
 import com.example.zerocode.employeeregistration.service.service.SalaryService;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class SalaryServiceImpl implements SalaryService {
 
-    private final SalaryRepository salaryRepository;
-    private final EmployeeRepository employeeRepository;
+  private final SalaryRepository salaryRepository;
+  private final EmployeeRepository employeeRepository;
+  private final ModelMapper modelMapper;
 
-    @Override
-    public CreateSalaryResponse addSalary(CreateSalaryRequest request, Long employeeId) throws EmployeeNotFoundException {
-        System.out.println("successfully adding salaries with employee id:" + employeeId);
+  @Override
+  public CreateSalaryResponse addSalary(CreateSalaryRequest request, Long employeeId)
+      throws EmployeeNotFoundException {
+    log.info("successfully adding salaries with employee id:{}", employeeId);
 
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException("Not found employee with id: " + employeeId));
+    var employee = employeeRepository.findById(employeeId)
+        .orElseThrow(
+            () -> new EmployeeNotFoundException("Not found employee with id: " + employeeId));
 
-            Salary salary = new Salary();
+    var salary = new Salary();
+    modelMapper.map(request, salary);
+    salary.setEmployee(employee);
+    salaryRepository.save(salary);
 
-            salary.setId(request.getId());
-            salary.setBasicSalary(request.getBasicSalary());
-            salary.setSalarySchedule(request.getSalarySchedule());
-            salary.setSalaryDate(request.getSalaryDate());
+    var response = new CreateSalaryResponse();
+    response.setId(salary.getId());
 
-            salary.setEmployee(employee);
+    return response;
+  }
 
-            salaryRepository.save(salary);
+  @Override
+  public SalaryResponse getSalaryById(Long employeeId) throws EmployeeNotFoundException {
+    log.info("getting salary with employee id : {}", employeeId);
 
-            CreateSalaryResponse response = new CreateSalaryResponse();
-            response.setId(salary.getId());
+    var employee = employeeRepository.findById(employeeId)
+        .orElseThrow(
+            () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
 
-            return response;
-    }
+    var salary = salaryRepository.findByEmployee(employee);
 
-    @Override
-    public SalaryResponse getSalaryById(Long employeeId) throws EmployeeNotFoundException {
-        System.out.println("getting salary with employee id : " + employeeId);
+    return SalaryResponse.builder()
+        .id(salary.getId())
+        .basicSalary(salary.getBasicSalary())
+        .salarySchedule(salary.getSalarySchedule())
+        .salaryDate(salary.getSalaryDate())
+        .employeeName(
+            salary.getEmployee().getFirstName() + " " + salary.getEmployee().getLastName())
+        .build();
+  }
 
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
+  @Override
+  public List<SalaryResponse> getAllSalaries() {
+    log.info("getting all salaries");
 
-            Salary salary = salaryRepository.findByEmployee(employee);
+    List<Salary> salaries = salaryRepository.findAll();
 
-            return SalaryResponse.builder()
-                    .id(salary.getId())
-                    .basicSalary(salary.getBasicSalary())
-                    .salarySchedule(salary.getSalarySchedule())
-                    .salaryDate(salary.getSalaryDate())
-                    .employeeName(salary.getEmployee().getFirstName() + " " + salary.getEmployee().getLastName())
-                    .build();
-    }
+    return salaries.stream()
+        .map(salary -> SalaryResponse.builder()
+            .id(salary.getId())
+            .basicSalary(salary.getBasicSalary())
+            .salarySchedule(salary.getSalarySchedule())
+            .salaryDate(salary.getSalaryDate())
+            .employeeName(
+                salary.getEmployee().getFirstName() + " " + salary.getEmployee().getLastName())
+            .build())
+        .toList();
+  }
 
-    @Override
-    public List<SalaryResponse> getAllSalaries(){
-        System.out.println("successfully getting all salaries");
+  @Override
+  public CreateSalaryResponse updateSalary(CreateSalaryRequest request, Long employeeId,
+      Long salaryId) throws EmployeeNotFoundException, SalaryNotFoundException {
+    log.info("updating salary with employee id : {}", employeeId);
 
-        List<Salary> salaries = salaryRepository.findAll();
+    var employee = employeeRepository.findById(employeeId)
+        .orElseThrow(
+            () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
 
-        return salaries.stream()
-                .map(salary -> SalaryResponse.builder()
-                        .id(salary.getId())
-                        .basicSalary(salary.getBasicSalary())
-                        .salarySchedule(salary.getSalarySchedule())
-                        .salaryDate(salary.getSalaryDate())
-                        .employeeName(salary.getEmployee().getFirstName() + " " + salary.getEmployee().getLastName())
-                        .build())
-                .toList();
-    }
+    var salary = salaryRepository.findById(salaryId)
+        .orElseThrow(() -> new SalaryNotFoundException("Not found salary with id:" + salaryId));
 
-    @Override
-    public CreateSalaryResponse updateSalary(CreateSalaryRequest request, Long employeeId, Long salaryId) throws EmployeeNotFoundException, SalaryNotFoundException {
-        System.out.println("update salary with employee id : " + employeeId);
+    modelMapper.map(request, salary);
+    salary.setEmployee(employee);
+    salaryRepository.save(salary);
 
-        employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
+    var response = new CreateSalaryResponse();
+    response.setId(salary.getId());
 
-            Salary salary = salaryRepository.findById(salaryId)
-                            .orElseThrow(() -> new SalaryNotFoundException("Not found salary with id:" + salaryId));
+    return response;
+  }
 
-                salary.setBasicSalary(request.getBasicSalary());
-                salary.setSalarySchedule(request.getSalarySchedule());
-                salary.setSalaryDate(request.getSalaryDate());
+  @Override
+  public CreateSalaryResponse deleteSalary(Long employeeId, Long salaryId)
+      throws SalaryNotFoundException {
+    log.info("deleting salary with employee id : {}", employeeId);
 
-                salaryRepository.save(salary);
+    employeeRepository.findById(employeeId)
+        .orElseThrow(
+            () -> new SalaryNotFoundException("Not found employee with id: " + employeeId));
 
-                CreateSalaryResponse response = new CreateSalaryResponse();
-                response.setId(salary.getId());
+    var salary = salaryRepository.findById(salaryId)
+        .orElseThrow(() -> new SalaryNotFoundException("Not found salary with id: " + salaryId));
 
-                return response;
-    }
+    salaryRepository.delete(salary);
 
-    @Override
-    public CreateSalaryResponse deleteSalary(Long employeeId, Long salaryId) throws SalaryNotFoundException {
-        System.out.println("delete salary by employee id : " + employeeId);
+    var response = new CreateSalaryResponse();
+    response.setId(salary.getId());
 
-        employeeRepository.findById(employeeId)
-                        .orElseThrow(() -> new SalaryNotFoundException("Not found employee with id: " + employeeId));
-
-        Salary salary = salaryRepository.findById(salaryId)
-                        .orElseThrow(() -> new SalaryNotFoundException("Not found salary with id: " + salaryId));
-
-        salaryRepository.delete(salary);
-
-        CreateSalaryResponse response = new CreateSalaryResponse();
-        response.setId(salary.getId());
-
-        return response;
-    }
+    return response;
+  }
 }
