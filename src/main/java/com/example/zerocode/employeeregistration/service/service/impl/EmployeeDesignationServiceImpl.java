@@ -7,108 +7,128 @@ import com.example.zerocode.employeeregistration.service.exception.DepartmentNot
 import com.example.zerocode.employeeregistration.service.exception.EmployeeDesignationNotFoundException;
 import com.example.zerocode.employeeregistration.service.exception.EmployeeNotFoundException;
 import com.example.zerocode.employeeregistration.service.model.Department;
-import com.example.zerocode.employeeregistration.service.model.Employee;
 import com.example.zerocode.employeeregistration.service.model.EmployeeDesignation;
 import com.example.zerocode.employeeregistration.service.repository.DepartmentRepository;
 import com.example.zerocode.employeeregistration.service.repository.EmployeeDesignationRepository;
 import com.example.zerocode.employeeregistration.service.repository.EmployeeRepository;
 import com.example.zerocode.employeeregistration.service.service.EmployeeDesignationService;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class EmployeeDesignationServiceImpl implements EmployeeDesignationService {
 
-    private final EmployeeDesignationRepository employeeDesignationRepository;
-    private final EmployeeRepository employeeRepository;
-    private final DepartmentRepository departmentRepository;
+  private final EmployeeDesignationRepository employeeDesignationRepository;
+  private final EmployeeRepository employeeRepository;
+  private final ModelMapper modelMapper;
+  private final DepartmentRepository departmentRepository;
 
-    @Override
-    public CreateEmployeeDesignationResponse addEmployeeDesignation(CreateEmployeeDesignationRequest request, Long employeeId, Long departmentId) throws EmployeeNotFoundException, DepartmentNotFoundException {
-        System.out.println("successfully adding employee designation with employee id:" + employeeId);
+  @Override
+  public CreateEmployeeDesignationResponse addEmployeeDesignation(
+      CreateEmployeeDesignationRequest request, Long employeeId)
+      throws EmployeeNotFoundException, DepartmentNotFoundException {
+    log.info("successfully adding employee designation with employee id:{}", employeeId);
 
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
+    var employee = employeeRepository.findById(employeeId)
+        .orElseThrow(
+            () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
 
-            Department department = departmentRepository.findById(departmentId)
-                    .orElseThrow(() -> new DepartmentNotFoundException("Not found department with id:" + departmentId));
-
-                EmployeeDesignation employeeDesignation = new EmployeeDesignation();
-
-                employeeDesignation.setId(request.getId());
-                employeeDesignation.setJobPosition(request.getJobPosition());
-                employeeDesignation.setStartDate(request.getStartDate());
-                employeeDesignation.setEndDate(request.getEndDate());
-
-                employeeDesignation.setEmployee(employee);
-
-                employeeDesignationRepository.save(employeeDesignation);
-
-                CreateEmployeeDesignationResponse response = new CreateEmployeeDesignationResponse();
-                response.setId(employeeDesignation.getId());
-
-                return response;
+    var employeeDesignation = new EmployeeDesignation();
+    modelMapper.map(request, employeeDesignation);
+    if (request.getDepartmentId() != null) {
+      Long departmentId = request.getDepartmentId();
+      Department department = departmentRepository.findById(departmentId)
+          .orElseThrow(() -> new DepartmentNotFoundException(
+              "Department not found with id: " + departmentId));
+      employeeDesignation.setEmployee(employee);
+      employeeDesignation.setDepartment(department);
     }
+    employeeDesignationRepository.save(employeeDesignation);
 
-    @Override
-    public List<EmployeeDesignationResponse> getEmployeeDesignation(Long employeeId) throws EmployeeNotFoundException {
-        System.out.println("getting employee designation with employeeId : " + employeeId);
+    var response = new CreateEmployeeDesignationResponse();
+    response.setId(employeeDesignation.getId());
 
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
+    return response;
+  }
 
-        List<EmployeeDesignation> employeeDesignations = employeeDesignationRepository.findByEmployee(employee);
+  @Override
+  public List<EmployeeDesignationResponse> getEmployeeDesignation(Long employeeId)
+      throws EmployeeNotFoundException {
+    log.info("getting employee designation with employeeId : {}", employeeId);
 
-        return employeeDesignations.stream()
-                .map(employeeDesignation -> EmployeeDesignationResponse .builder()
-                        .id(employeeDesignation.getId())
-                        .jobPosition(employeeDesignation.getJobPosition())
-                        .startDate(employeeDesignation.getStartDate())
-                        .endDate(employeeDesignation.getEndDate())
-                        .build())
-                .toList();
+    var employee = employeeRepository.findById(employeeId)
+        .orElseThrow(
+            () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
+
+    List<EmployeeDesignation> employeeDesignations = employeeDesignationRepository.findByEmployee(
+        employee);
+
+    return employeeDesignations.stream()
+        .map(employeeDesignation -> EmployeeDesignationResponse.builder()
+            .id(employeeDesignation.getId())
+            .jobPosition(employeeDesignation.getJobPosition())
+            .startDate(employeeDesignation.getStartDate())
+            .endDate(employeeDesignation.getEndDate())
+            .build())
+        .toList();
+  }
+
+  @Override
+  public CreateEmployeeDesignationResponse updateEmployeeDesignation(
+      CreateEmployeeDesignationRequest request, Long employeeId, Long employeeDesignationId)
+      throws EmployeeNotFoundException, EmployeeDesignationNotFoundException, DepartmentNotFoundException {
+    log.info("updating employee designation with employee id:{}", employeeDesignationId);
+
+    var employee = employeeRepository.findById(employeeId)
+        .orElseThrow(
+            () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
+
+    var employeeDesignation = employeeDesignationRepository.findById(
+            employeeDesignationId)
+        .orElseThrow(() -> new EmployeeDesignationNotFoundException(
+            "Not found employee designation with id:" + employeeDesignationId));
+
+    modelMapper.map(request, employeeDesignation);
+    if (request.getDepartmentId() != null) {
+      Long departmentId = request.getDepartmentId();
+      Department department = departmentRepository.findById(departmentId)
+          .orElseThrow(() -> new DepartmentNotFoundException(
+              "Department not found with id: " + departmentId));
+      employeeDesignation.setEmployee(employee);
+      employeeDesignation.setDepartment(department);
     }
+    employeeDesignationRepository.save(employeeDesignation);
 
-    @Override
-    public CreateEmployeeDesignationResponse updateEmployeeDesignation(CreateEmployeeDesignationRequest request, Long employeeId, Long employeeDesignationId) throws EmployeeNotFoundException, EmployeeDesignationNotFoundException {
-        System.out.println("update by employee id : " + employeeId);
+    var response = new CreateEmployeeDesignationResponse();
+    response.setId(employeeDesignation.getId());
 
-        employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
+    return response;
+  }
 
-            EmployeeDesignation employeeDesignation = employeeDesignationRepository.findById(employeeDesignationId)
-                            .orElseThrow(() -> new EmployeeDesignationNotFoundException("Not found employee designation with id:" + employeeDesignationId));
+  @Override
+  public CreateEmployeeDesignationResponse deleteEmployeeDesignation(Long employeeDesignationId,
+      Long employeeId) throws EmployeeNotFoundException, EmployeeDesignationNotFoundException {
+    log.info("deleting employee designation with employee id:{}", employeeDesignationId);
 
-                employeeDesignation.setJobPosition(request.getJobPosition());
-                employeeDesignation.setStartDate(request.getStartDate());
-                employeeDesignation.setEndDate(request.getEndDate());
+    employeeRepository.findById(employeeId)
+        .orElseThrow(
+            () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
 
-                employeeDesignationRepository.save(employeeDesignation);
+    var employeeDesignation = employeeDesignationRepository.findById(
+            employeeDesignationId)
+        .orElseThrow(() -> new EmployeeDesignationNotFoundException(
+            "Not found employee designation with id:" + employeeDesignationId));
 
-                CreateEmployeeDesignationResponse response = new CreateEmployeeDesignationResponse();
-                response.setId(employeeDesignation.getId());
+    employeeDesignationRepository.delete(employeeDesignation);
 
-                return response;
-    }
+    var response = new CreateEmployeeDesignationResponse();
+    response.setId(employeeDesignation.getId());
 
-    @Override
-    public CreateEmployeeDesignationResponse deleteEmployeeDesignation(Long employeeDesignationId, Long employeeId) throws EmployeeNotFoundException, EmployeeDesignationNotFoundException {
-        System.out.println("delete by employee id : " + employeeId);
-
-        employeeRepository.findById(employeeId)
-                        .orElseThrow(() -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
-
-        EmployeeDesignation employeeDesignation = employeeDesignationRepository.findById(employeeDesignationId)
-                        .orElseThrow(() -> new EmployeeDesignationNotFoundException("Not found employee designation with id:" + employeeDesignationId));
-
-        employeeDesignationRepository.delete(employeeDesignation);
-
-        CreateEmployeeDesignationResponse response = new CreateEmployeeDesignationResponse();
-        response.setId(employeeDesignation.getId());
-
-        return response;
-    }
+    return response;
+  }
 }
