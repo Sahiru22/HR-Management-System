@@ -74,9 +74,6 @@ public class Employee {
   private List<IssuedItem> issuedItems;
 
   @OneToMany(mappedBy = "employee")
-  private List<EmergencyContact> emergencyContacts;
-
-  @OneToMany(mappedBy = "employee")
   private List<EmployeeDesignation> employeeDesignations;
 
   @OneToMany(mappedBy = "employee")

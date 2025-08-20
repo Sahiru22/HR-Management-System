@@ -63,8 +63,6 @@ public class DependentDetailServiceImpl implements DependentDetailService {
             .relationship(dependentDetail.getRelationship())
             .contactNumber(dependentDetail.getContactNumber())
             .email(dependentDetail.getEmail())
-            .address(dependentDetail.getAddress())
-            .memo(dependentDetail.getMemo())
             .build())
         .toList();
 
