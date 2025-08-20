@@ -5,104 +5,104 @@ import com.example.zerocode.employeeregistration.service.controller.response.Cre
 import com.example.zerocode.employeeregistration.service.controller.response.LeaveResponse;
 import com.example.zerocode.employeeregistration.service.exception.EmployeeNotFoundException;
 import com.example.zerocode.employeeregistration.service.exception.LeaveNotFoundException;
-import com.example.zerocode.employeeregistration.service.model.Employee;
 import com.example.zerocode.employeeregistration.service.model.Leave;
 import com.example.zerocode.employeeregistration.service.repository.EmployeeRepository;
 import com.example.zerocode.employeeregistration.service.repository.LeaveRepository;
 import com.example.zerocode.employeeregistration.service.service.LeaveService;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
-
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class LeaveServiceImpl implements LeaveService {
 
-    private final LeaveRepository leaveRepository;
-    private final EmployeeRepository employeeRepository;
+  private final LeaveRepository leaveRepository;
+  private final EmployeeRepository employeeRepository;
+  private final ModelMapper modelMapper;
 
-    @Override
-    public CreateLeaveResponse addLeave(CreateLeaveRequest request, Long employeeId) throws EmployeeNotFoundException {
-        System.out.println("successfully adding leaves with employee id:" + employeeId);
+  @Override
+  public CreateLeaveResponse addLeave(CreateLeaveRequest request, Long employeeId)
+      throws EmployeeNotFoundException {
+    log.info("successfully adding leaves with employee id:{}", employeeId);
 
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
+    var employee = employeeRepository.findById(employeeId)
+        .orElseThrow(
+            () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
 
-            Leave leave = new Leave();
+    var leave = new Leave();
+    modelMapper.map(request, leave);
+    leave.setEmployee(employee);
+    leaveRepository.save(leave);
 
-            leave.setId(request.getId());
-            leave.setLeaveType(request.getLeaveType());
-            leave.setLeaveBalance(request.getLeaveBalance());
-            leave.setLeaveDate(request.getLeaveDate());
+    var response = new CreateLeaveResponse();
+    response.setId(leave.getId());
 
-            leave.setEmployee(employee);
+    return response;
+  }
 
-            leaveRepository.save(leave);
+  @Override
+  public List<LeaveResponse> getLeaves(Long employeeId) throws EmployeeNotFoundException {
+    log.info("getting leaves with employeeId : {}", employeeId);
 
-            CreateLeaveResponse response = new CreateLeaveResponse();
-            response.setId(leave.getId());
+    var employee = employeeRepository.findById(employeeId)
+        .orElseThrow(
+            () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
 
-            return response;
-    }
+    List<Leave> leaves = leaveRepository.findByEmployee(employee);
 
-    @Override
-    public List<LeaveResponse> getLeaves(Long employeeId) throws EmployeeNotFoundException {
-        System.out.println("getting leaves with employeeId : " + employeeId);
+    return leaves.stream()
+        .map(leave -> LeaveResponse.builder()
+            .id(leave.getId())
+            .leaveType(leave.getLeaveType())
+            .leaveBalance(leave.getLeaveBalance())
+            .leaveDate(leave.getLeaveDate())
+            .build())
+        .toList();
+  }
 
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
+  @Override
+  public CreateLeaveResponse updateLeave(CreateLeaveRequest request, Long employeeId, Long leaveId)
+      throws EmployeeNotFoundException, LeaveNotFoundException {
+    log.info("update leave by employee id : {}", employeeId);
 
-        List<Leave> leaves = leaveRepository.findByEmployee(employee);
+    var employee = employeeRepository.findById(employeeId)
+        .orElseThrow(
+            () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
 
-        return leaves.stream()
-                .map(leave -> LeaveResponse.builder()
-                        .id(leave.getId())
-                        .leaveType(leave.getLeaveType())
-                        .leaveBalance(leave.getLeaveBalance())
-                        .leaveDate(leave.getLeaveDate())
-                        .build())
-                .toList();
-    }
+    var leave = leaveRepository.findById(leaveId)
+        .orElseThrow(() -> new LeaveNotFoundException("Not found leave with id:" + leaveId));
 
-    @Override
-    public CreateLeaveResponse updateLeave(CreateLeaveRequest request, Long employeeId, Long leaveId) throws EmployeeNotFoundException, LeaveNotFoundException {
-        System.out.println("update leave by employee id : " + employeeId);
+    modelMapper.map(request, leave);
+    leave.setEmployee(employee);
+    leaveRepository.save(leave);
 
-        employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
+    var response = new CreateLeaveResponse();
+    response.setId(leave.getId());
 
-        Leave leave = leaveRepository.findById(leaveId)
-                        .orElseThrow(() -> new LeaveNotFoundException("Not found leave with id:" + leaveId));
+    return response;
+  }
 
-                leave.setLeaveType(request.getLeaveType());
-                leave.setLeaveBalance(request.getLeaveBalance());
-                leave.setLeaveDate(request.getLeaveDate());
+  @Override
+  public CreateLeaveResponse deleteLeave(Long employeeId, Long leaveId)
+      throws EmployeeNotFoundException, LeaveNotFoundException {
+    log.info("delete leave by employee id : {}", employeeId);
 
-                leaveRepository.save(leave);
+    employeeRepository.findById(employeeId)
+        .orElseThrow(
+            () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
 
-                CreateLeaveResponse response = new CreateLeaveResponse();
-                response.setId(leave.getId());
+    var leave = leaveRepository.findById(leaveId)
+        .orElseThrow(() -> new LeaveNotFoundException("Not found leave with id:" + leaveId));
 
-                return  response;
-    }
+    leaveRepository.delete(leave);
 
-    @Override
-    public CreateLeaveResponse deleteLeave(Long employeeId, Long leaveId) throws EmployeeNotFoundException, LeaveNotFoundException {
-        System.out.println("delete leave by employee id : " + employeeId);
+    var response = new CreateLeaveResponse();
+    response.setId(leave.getId());
 
-        employeeRepository.findById(employeeId)
-                        .orElseThrow(() -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
-
-        Leave leave = leaveRepository.findById(leaveId)
-                        .orElseThrow(() -> new LeaveNotFoundException("Not found leave with id:" + leaveId));
-
-        leaveRepository.delete(leave);
-
-        CreateLeaveResponse response = new CreateLeaveResponse();
-        response.setId(leave.getId());
-
-        return response;
-    }
+    return response;
+  }
 }
