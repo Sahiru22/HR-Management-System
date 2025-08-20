@@ -4,5 +4,6 @@ import lombok.Data;
 
 @Data
 public class CreateEmergencyContactResponse {
-    private Long id;
+
+  private Long id;
 }
