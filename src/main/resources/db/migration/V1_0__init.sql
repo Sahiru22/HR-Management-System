@@ -23,7 +23,7 @@ DROP TABLE IF EXISTS `allowances`;
 CREATE TABLE `allowances` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `allowance_type` varchar(255) DEFAULT NULL,
-  `allowance_date` varchar(255) NOT NULL,
+  `allowance_date` DATE NOT NULL,
   `allowance_fee` decimal(10,2) NOT NULL,
   `employee_id` bigint DEFAULT NULL,
   `created_at` bigint DEFAULT NULL,

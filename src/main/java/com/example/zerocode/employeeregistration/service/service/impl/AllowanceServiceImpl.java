@@ -6,6 +6,7 @@ import com.example.zerocode.employeeregistration.service.controller.response.Cre
 import com.example.zerocode.employeeregistration.service.exception.AllowanceNotFoundException;
 import com.example.zerocode.employeeregistration.service.exception.EmployeeNotFoundException;
 import com.example.zerocode.employeeregistration.service.model.Allowance;
+import com.example.zerocode.employeeregistration.service.model.Employee;
 import com.example.zerocode.employeeregistration.service.repository.AllowanceRepository;
 import com.example.zerocode.employeeregistration.service.repository.EmployeeRepository;
 import com.example.zerocode.employeeregistration.service.service.AllowanceService;
@@ -25,25 +26,25 @@ public class AllowanceServiceImpl implements AllowanceService {
   private final ModelMapper modelMapper;
 
   @Override
-  public CreateAllowanceResponse addAllowance(CreateAllowanceRequest request, Long employeeId)
+  public CreateAllowanceResponse addAllowance(CreateAllowanceRequest request)
       throws EmployeeNotFoundException {
-    log.info("successfully adding allowance by employee id:{}", employeeId);
-
-    var employee = employeeRepository.findById(employeeId)
-        .orElseThrow(
-            () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
+    log.info("successfully adding allowance by employee id: {}", request.getEmployeeId());
 
     var allowance = new Allowance();
     modelMapper.map(request, allowance);
-    allowance.setEmployee(employee);
 
+    if (request.getEmployeeId() != null) {
+      Employee employee = employeeRepository.findById(request.getEmployeeId())
+          .orElseThrow(() -> new EmployeeNotFoundException(
+              "Not found employee with id:" + request.getEmployeeId()));
+      allowance.setEmployee(employee);
+    }
     allowanceRepository.save(allowance);
 
     var response = new CreateAllowanceResponse();
     response.setId(allowance.getId());
 
     return response;
-
   }
 
   @Override
@@ -67,14 +68,9 @@ public class AllowanceServiceImpl implements AllowanceService {
   }
 
   @Override
-  public List<AllowanceResponse> getAllowanceById(Long employeeId, Long allowanceId)
-      throws EmployeeNotFoundException, AllowanceNotFoundException {
-    log.info("Getting allowance with employee Id: {} and allowance Id: {}", employeeId,
-        allowanceId);
-
-    employeeRepository.findById(employeeId)
-        .orElseThrow(() -> new EmployeeNotFoundException(
-            "Not found employee with id: " + employeeId));
+  public List<AllowanceResponse> getAllowanceById(Long allowanceId)
+      throws AllowanceNotFoundException {
+    log.info("Getting allowance with allowance Id: {}", allowanceId);
 
     var allowance = allowanceRepository.findById(allowanceId)
         .orElseThrow(
@@ -85,25 +81,29 @@ public class AllowanceServiceImpl implements AllowanceService {
         .allowanceType(allowance.getAllowanceType())
         .allowanceFee(allowance.getAllowanceFee())
         .allowanceDate(allowance.getAllowanceDate())
+        .employeeId(allowance.getEmployee().getId())
+        .employeeFirstName(allowance.getEmployee().getFirstName())
+        .employeeLastName(allowance.getEmployee().getLastName())
         .build());
   }
 
   @Override
-  public CreateAllowanceResponse updateAllowance(CreateAllowanceRequest request, Long employeeId,
+  public CreateAllowanceResponse updateAllowance(CreateAllowanceRequest request,
       Long allowanceId) throws EmployeeNotFoundException, AllowanceNotFoundException {
-    log.info("update allowance with employee id : {}", employeeId);
-
-    var employee = employeeRepository.findById(employeeId)
-        .orElseThrow(
-            () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
+    log.info("update allowance with employee id : {}", request.getEmployeeId());
 
     var allowance = allowanceRepository.findById(allowanceId)
         .orElseThrow(
             () -> new AllowanceNotFoundException("Not found allowance with id:" + allowanceId));
 
     modelMapper.map(request, allowance);
-    allowance.setEmployee(employee);
 
+    if (request.getEmployeeId() != null) {
+      Employee employee = employeeRepository.findById(request.getEmployeeId())
+          .orElseThrow(() -> new EmployeeNotFoundException(
+              "Not found employee with id:" + request.getEmployeeId()));
+      allowance.setEmployee(employee);
+    }
     allowanceRepository.save(allowance);
 
     var response = new CreateAllowanceResponse();
@@ -113,13 +113,9 @@ public class AllowanceServiceImpl implements AllowanceService {
   }
 
   @Override
-  public CreateAllowanceResponse deleteAllowance(Long employeeId, Long allowanceId)
-      throws EmployeeNotFoundException, AllowanceNotFoundException {
-    log.info("delete allowance by employee id : {}", employeeId);
-
-    employeeRepository.findById(employeeId)
-        .orElseThrow(
-            () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
+  public CreateAllowanceResponse deleteAllowance(Long allowanceId)
+      throws AllowanceNotFoundException {
+    log.info("delete allowance by id : {}", allowanceId);
 
     var allowance = allowanceRepository.findById(allowanceId)
         .orElseThrow(

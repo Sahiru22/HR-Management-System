@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,5 +24,8 @@ public class CreateAllowanceRequest {
   private BigDecimal allowanceFee;
 
   @NotNull
-  private String allowanceDate;
+  private LocalDate allowanceDate;
+
+  @NotNull
+  private Long employeeId;
 }
