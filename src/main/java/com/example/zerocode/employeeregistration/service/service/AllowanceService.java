@@ -9,17 +9,16 @@ import java.util.List;
 
 public interface AllowanceService {
 
-  CreateAllowanceResponse addAllowance(CreateAllowanceRequest request, Long employeeId)
+  CreateAllowanceResponse addAllowance(CreateAllowanceRequest request)
       throws EmployeeNotFoundException;
 
   List<AllowanceResponse> getAllowance(Long employeeId) throws EmployeeNotFoundException;
 
-  List<AllowanceResponse> getAllowanceById(Long employeeId, Long allowanceId)
-      throws EmployeeNotFoundException, AllowanceNotFoundException;
+  List<AllowanceResponse> getAllowanceById(Long allowanceId) throws AllowanceNotFoundException;
 
-  CreateAllowanceResponse updateAllowance(CreateAllowanceRequest request, Long employeeId,
+  CreateAllowanceResponse updateAllowance(CreateAllowanceRequest request,
       Long allowanceId) throws EmployeeNotFoundException, AllowanceNotFoundException;
 
-  CreateAllowanceResponse deleteAllowance(Long employeeId, Long allowanceId)
-      throws EmployeeNotFoundException, AllowanceNotFoundException;
+  CreateAllowanceResponse deleteAllowance(Long allowanceId)
+      throws AllowanceNotFoundException;
 }

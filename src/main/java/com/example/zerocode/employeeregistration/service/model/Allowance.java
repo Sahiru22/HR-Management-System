@@ -13,6 +13,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -35,7 +36,7 @@ public class Allowance extends BaseEntity<Long> {
   private BigDecimal allowanceFee;
 
   @NotNull
-  private String allowanceDate;
+  private LocalDate allowanceDate;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "employee_id")
