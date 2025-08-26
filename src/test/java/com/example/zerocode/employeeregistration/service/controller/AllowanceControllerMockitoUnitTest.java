@@ -1,7 +1,6 @@
 package com.example.zerocode.employeeregistration.service.controller;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -75,20 +74,78 @@ public class AllowanceControllerMockitoUnitTest {
   @Test
   @DisplayName("Find allowances with search and date filter")
   void testFindAllowances() throws Exception {
-    AllowanceBasicDTO dto1 = mock(AllowanceBasicDTO.class);
-    when(dto1.getId()).thenReturn(1L);
-    when(dto1.getAllowanceType()).thenReturn("Transport");
-    when(dto1.getAllowanceFee()).thenReturn(new BigDecimal("500.00"));
-    when(dto1.getAllowanceDate()).thenReturn(LocalDate.parse("2025-08-16"));
 
-    AllowanceBasicDTO dto2 = mock(AllowanceBasicDTO.class);
-    when(dto2.getId()).thenReturn(2L);
-    when(dto2.getAllowanceType()).thenReturn("Food");
-    when(dto2.getAllowanceFee()).thenReturn(new BigDecimal("600.00"));
-    when(dto2.getAllowanceDate()).thenReturn(LocalDate.parse("2025-08-17"));
+    AllowanceBasicDTO dto1 = new AllowanceBasicDTO() {
+      public Long getId() {
+        return 1L;
+      }
+
+      public String getAllowanceType() {
+        return "Transport";
+      }
+
+      public BigDecimal getAllowanceFee() {
+        return new BigDecimal("500.00");
+      }
+
+      public LocalDate getAllowanceDate() {
+        return LocalDate.parse("2025-08-16");
+      }
+
+      public Employee getEmployee() {
+        return new Employee() {
+          public Long getId() {
+            return 1L;
+          }
+
+          public String getFirstName() {
+            return "John";
+          }
+
+          public String getLastName() {
+            return "Doe";
+          }
+        };
+      }
+    };
+
+    AllowanceBasicDTO dto2 = new AllowanceBasicDTO() {
+      public Long getId() {
+        return 2L;
+      }
+
+      public String getAllowanceType() {
+        return "Food";
+      }
+
+      public BigDecimal getAllowanceFee() {
+        return new BigDecimal("600.00");
+      }
+
+      public LocalDate getAllowanceDate() {
+        return LocalDate.parse("2025-08-17");
+      }
+
+      public Employee getEmployee() {
+        return new Employee() {
+          public Long getId() {
+            return 2L;
+          }
+
+          public String getFirstName() {
+            return "Alice";
+          }
+
+          public String getLastName() {
+            return "Smith";
+          }
+        };
+      }
+    };
 
     Page<AllowanceBasicDTO> page = new PageImpl<>(List.of(dto1, dto2));
-    when(allowanceRepository.findBy(any(Predicate.class), any())).thenReturn(page);
+    when(allowanceRepository.findBy(any(Predicate.class), any()))
+        .thenReturn(page);
 
     mockMvc.perform(get("/allowances")
             .header("version", "v1")
@@ -100,8 +157,10 @@ public class AllowanceControllerMockitoUnitTest {
         .andExpect(jsonPath("$.content.length()").value(2))
         .andExpect(jsonPath("$.content[0].allowanceType").value("Transport"))
         .andExpect(jsonPath("$.content[0].allowanceFee").value(500.00))
+        .andExpect(jsonPath("$.content[0].employee.firstName").value("John"))
         .andExpect(jsonPath("$.content[1].allowanceType").value("Food"))
-        .andExpect(jsonPath("$.content[1].allowanceFee").value(600.00));
+        .andExpect(jsonPath("$.content[1].allowanceFee").value(600.00))
+        .andExpect(jsonPath("$.content[1].employee.firstName").value("Alice"));
   }
 
 
