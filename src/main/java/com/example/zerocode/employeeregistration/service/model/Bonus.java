@@ -1,6 +1,7 @@
 package com.example.zerocode.employeeregistration.service.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -12,6 +13,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -34,9 +36,9 @@ public class Bonus extends BaseEntity<Long> {
   private BigDecimal bonusAmount;
 
   @NotNull
-  private String bonusDate;
+  private LocalDate bonusDate;
 
-  @ManyToOne(optional = false)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "employee_id")
   private Employee employee;
 }

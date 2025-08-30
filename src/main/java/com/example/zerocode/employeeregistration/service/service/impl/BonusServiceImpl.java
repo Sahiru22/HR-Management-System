@@ -6,6 +6,7 @@ import com.example.zerocode.employeeregistration.service.controller.response.Cre
 import com.example.zerocode.employeeregistration.service.exception.BonusNotFoundException;
 import com.example.zerocode.employeeregistration.service.exception.EmployeeNotFoundException;
 import com.example.zerocode.employeeregistration.service.model.Bonus;
+import com.example.zerocode.employeeregistration.service.model.Employee;
 import com.example.zerocode.employeeregistration.service.repository.BonusRepository;
 import com.example.zerocode.employeeregistration.service.repository.EmployeeRepository;
 import com.example.zerocode.employeeregistration.service.service.BonusService;
@@ -25,17 +26,19 @@ public class BonusServiceImpl implements BonusService {
   private final ModelMapper modelMapper;
 
   @Override
-  public CreateBonusResponse addBonus(CreateBonusRequest request, Long employeeId)
+  public CreateBonusResponse addBonus(CreateBonusRequest request)
       throws EmployeeNotFoundException {
-    log.info("successfully adding bonus by employee id : {}", employeeId);
-
-    var employee = employeeRepository.findById(employeeId)
-        .orElseThrow(
-            () -> new EmployeeNotFoundException("Not found employee with id: " + employeeId));
+    log.info("successfully adding bonus by employee id: {}", request.getEmployeeId());
 
     var bonus = new Bonus();
     modelMapper.map(request, bonus);
-    bonus.setEmployee(employee);
+
+    if (request.getEmployeeId() != null) {
+      Employee employee = employeeRepository.findById(request.getEmployeeId())
+          .orElseThrow(() -> new EmployeeNotFoundException(
+              "Not found employee with id:" + request.getEmployeeId()));
+      bonus.setEmployee(employee);
+    }
     bonusRepository.save(bonus);
 
     var response = new CreateBonusResponse();
@@ -65,19 +68,36 @@ public class BonusServiceImpl implements BonusService {
   }
 
   @Override
-  public CreateBonusResponse updateBonus(CreateBonusRequest request, Long employeeId, Long bonusId)
-      throws EmployeeNotFoundException, BonusNotFoundException {
-    log.info("update bonus by employee id : {}", employeeId);
+  public List<BonusResponse> getBonusById(Long bonusId) throws BonusNotFoundException {
+    log.info("Getting bonus with bonus Id: {}", bonusId);
 
-    var employee = employeeRepository.findById(employeeId)
-        .orElseThrow(
-            () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
+    var bonus = bonusRepository.findById(bonusId)
+        .orElseThrow(() -> new BonusNotFoundException("Not found bonus with id:" + bonusId));
+
+    return List.of(BonusResponse.builder()
+        .id(bonus.getId())
+        .bonusType(bonus.getBonusType())
+        .bonusAmount(bonus.getBonusAmount())
+        .bonusDate(bonus.getBonusDate())
+        .build());
+  }
+
+  @Override
+  public CreateBonusResponse updateBonus(CreateBonusRequest request, Long bonusId)
+      throws EmployeeNotFoundException, BonusNotFoundException {
+    log.info("update bonus with employee id : {}", request.getEmployeeId());
 
     var bonus = bonusRepository.findById(bonusId)
         .orElseThrow(() -> new BonusNotFoundException("Not found bonus with id:" + bonusId));
 
     modelMapper.map(request, bonus);
-    bonus.setEmployee(employee);
+
+    if (request.getEmployeeId() != null) {
+      Employee employee = employeeRepository.findById(request.getEmployeeId())
+          .orElseThrow(() -> new EmployeeNotFoundException(
+              "Not found employee with id:" + request.getEmployeeId()));
+      bonus.setEmployee(employee);
+    }
     bonusRepository.save(bonus);
 
     var response = new CreateBonusResponse();
@@ -87,13 +107,9 @@ public class BonusServiceImpl implements BonusService {
   }
 
   @Override
-  public CreateBonusResponse deleteBonus(Long employeeId, Long bonusId)
-      throws EmployeeNotFoundException, BonusNotFoundException {
-    log.info("delete bonus by employee id : {}", employeeId);
-
-    employeeRepository.findById(employeeId)
-        .orElseThrow(
-            () -> new EmployeeNotFoundException("Not found employee with id:" + employeeId));
+  public CreateBonusResponse deleteBonus(Long bonusId)
+      throws BonusNotFoundException {
+    log.info("delete bonus by id : {}", bonusId);
 
     var bonus = bonusRepository.findById(bonusId)
         .orElseThrow(() -> new BonusNotFoundException("Not found bonus with id:" + bonusId));

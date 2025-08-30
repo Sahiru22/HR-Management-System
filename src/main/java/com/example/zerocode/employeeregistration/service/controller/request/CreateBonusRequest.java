@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,5 +24,8 @@ public class CreateBonusRequest {
   private BigDecimal bonusAmount;
 
   @NotNull
-  private String bonusDate;
+  private LocalDate bonusDate;
+
+  @NotNull
+  private Long employeeId;
 }

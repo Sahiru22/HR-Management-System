@@ -45,7 +45,7 @@ CREATE TABLE `bonuses` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `bonus_type` varchar(255) DEFAULT NULL,
   `bonus_amount` decimal(10,2) NOT NULL,
-  `bonus_date` varchar(255) NOT NULL,
+  `bonus_date` DATE NOT NULL,
   `employee_id` bigint NOT NULL,
   `created_at` bigint DEFAULT NULL,
   `created_by` varchar(60) DEFAULT NULL,
