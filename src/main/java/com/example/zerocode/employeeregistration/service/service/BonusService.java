@@ -9,14 +9,16 @@ import java.util.List;
 
 public interface BonusService {
 
-  CreateBonusResponse addBonus(CreateBonusRequest request, Long employeeId)
+  CreateBonusResponse addBonus(CreateBonusRequest request)
       throws EmployeeNotFoundException;
 
   List<BonusResponse> getBonus(Long employeeId) throws EmployeeNotFoundException;
 
-  CreateBonusResponse updateBonus(CreateBonusRequest request, Long employeeId, Long bonusId)
+  List<BonusResponse> getBonusById(Long bonusId) throws BonusNotFoundException;
+
+  CreateBonusResponse updateBonus(CreateBonusRequest request, Long bonusId)
       throws EmployeeNotFoundException, BonusNotFoundException;
 
-  CreateBonusResponse deleteBonus(Long employeeId, Long bonusId)
-      throws EmployeeNotFoundException, BonusNotFoundException;
+  CreateBonusResponse deleteBonus(Long bonusId)
+      throws BonusNotFoundException;
 }
